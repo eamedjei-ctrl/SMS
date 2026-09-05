@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin · Settings &amp; Backups</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>General Settings</h2></div>
+        <div class="two-col">
+          <div class="field"><label>School Year</label><input value="2026/2027"></div>
+          <div class="field"><label>Timezone</label>
+            <select><option>GMT (Accra)</option><option>UTC</option><option>WAT</option></select>
+          </div>
+        </div>
+        <button class="btn">Save Settings</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Backups</h2></div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="label">Last Backup</div><div class="value">Today, 03:00</div></div>
+          <div class="stat-card"><div class="label">Backup Size</div><div class="value">1.8 GB</div></div>
+          <div class="stat-card"><div class="label">Frequency</div><div class="value">Daily</div></div>
+        </div>
+        <button class="btn" onclick="alert('Backup started (demo only)')">Run Backup Now</button>
+        <table style="margin-top:16px;">
+          <thead><tr><th>Date</th><th>Size</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>2026-09-05 03:00</td><td>1.8 GB</td><td><span class="badge green">Success</span></td></tr>
+            <tr><td>2026-09-04 03:00</td><td>1.8 GB</td><td><span class="badge green">Success</span></td></tr>
+            <tr><td>2026-09-03 03:00</td><td>1.7 GB</td><td><span class="badge yellow">Partial</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Integrations</h2></div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="label">SMS Gateway</div>
+            <div class="value" style="font-size:16px;"><span class="badge green">Connected</span></div>
+            <button class="btn ghost small" style="margin-top:10px;">Configure</button>
+          </div>
+          <div class="stat-card">
+            <div class="label">Email Provider</div>
+            <div class="value" style="font-size:16px;"><span class="badge green">Connected</span></div>
+            <button class="btn ghost small" style="margin-top:10px;">Configure</button>
+          </div>
+          <div class="stat-card">
+            <div class="label">Payment Gateway</div>
+            <div class="value" style="font-size:16px;"><span class="badge grey">Not connected</span></div>
+            <button class="btn ghost small" style="margin-top:10px;">Configure</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"superadmin", active:"superadmin-settings.html", title:"Settings & Backups", sub:"Platform configuration, backups and integrations" });
+</script>
+</body>
+</html>

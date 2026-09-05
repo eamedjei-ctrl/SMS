@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent · Overview</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel" id="profile-card"></div>
+      <div class="stat-grid" id="stats"></div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head"><h2>Recent Notices</h2><a href="parent-notices.html" class="hint">View all →</a></div>
+          <div id="notices-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Recent Result</h2><a href="parent-results.html" class="hint">View all →</a></div>
+          <div id="result-panel"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"parent", active:"parent.html", title:"Parent Overview", sub:"Tracking Kojo Mensah's progress" });
+
+  const ward = DB.students[0];
+  document.getElementById("profile-card").innerHTML = `
+    <div class="row-flex" style="gap:16px;">
+      <span class="avatar" style="width:52px;height:52px;font-size:18px;">${initials(ward.name)}</span>
+      <div>
+        <div class="title" style="font-size:17px;">${ward.name}</div>
+        <div class="meta">${ward.class} · Admission No. ${ward.admission}</div>
+      </div>
+    </div>
+  `;
+
+  const myNotices = DB.notices.filter(n=>n.role==="All"||n.role==="Parent");
+
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card"><div class="label">Attendance</div><div class="value">${ward.attendance}%</div></div>
+    <div class="stat-card"><div class="label">Current Average</div><div class="value">${ward.avg}</div></div>
+    <div class="stat-card"><div class="label">Unread Notices</div><div class="value">${myNotices.length}</div></div>
+  `;
+
+  document.getElementById("notices-list").innerHTML = myNotices.slice().reverse().slice(0,3).map(n=>`
+    <div class="list-item">
+      <div><div class="title">${n.title}</div><div class="meta">${n.date}</div></div>
+      <span class="badge blue">${n.role}</span>
+    </div>`).join("");
+
+  const result = DB.results.find(r=>r.student===ward.name);
+  document.getElementById("result-panel").innerHTML = result ? `
+    <div class="list-item">
+      <div><div class="title">${result.class} · ${result.term}</div><div class="meta">Position ${result.position} · Grade ${result.grade}</div></div>
+      <span class="badge ${badgeFor(result.status)}">${result.status}</span>
+    </div>` : `<div class="empty">No results yet</div>`;
+</script>
+</body>
+</html>

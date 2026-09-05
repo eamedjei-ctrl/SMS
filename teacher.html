@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher · Overview</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head"><h2>Today's Attendance Summary</h2><a href="teacher-attendance.html" class="hint">Take attendance →</a></div>
+          <div id="attendance-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Assignments Due Soon</h2><a href="teacher-assignments.html" class="hint">View all →</a></div>
+          <div id="assignments-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const session = renderShell({ role:"teacher", active:"teacher.html", title:"Teacher Overview", sub:"Daniel Mensah · Mathematics Department" });
+
+  const myClasses = classesForTeacher(session.name);
+  const myStudents = studentsForTeacher(session.name);
+  const myStudentNames = myStudents.map(s=>s.name);
+  const myAttendanceToday = DB.attendanceToday.filter(a=>myStudentNames.includes(a.student));
+  const myAssessments = DB.assessments.filter(a=>myStudentNames.includes(a.student));
+
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card"><div class="label">Classes Today</div><div class="value">${myClasses.length}</div></div>
+    <div class="stat-card"><div class="label">Students Present</div><div class="value">${myAttendanceToday.filter(a=>a.status==="Present").length}/${myAttendanceToday.length}</div></div>
+    <div class="stat-card"><div class="label">Pending Assignments</div><div class="value">${DB.assignments.filter(a=>a.status==="Pending").length}</div></div>
+    <div class="stat-card"><div class="label">Marks Entries Recorded</div><div class="value">${myAssessments.length}</div></div>
+  `;
+
+  document.getElementById("attendance-list").innerHTML = myAttendanceToday.length ? myAttendanceToday.map(a=>`
+    <div class="list-item">
+      <div><div class="title">${a.student}</div></div>
+      <span class="badge ${badgeFor(a.status)}">${a.status}</span>
+    </div>`).join("") : `<div class="empty">No attendance recorded yet today</div>`;
+
+  document.getElementById("assignments-list").innerHTML = DB.assignments.map(a=>`
+    <div class="list-item">
+      <div><div class="title">${a.title}</div><div class="meta">${a.subject} · Due ${a.due}</div></div>
+      <span class="badge ${badgeFor(a.status)}">${a.status}</span>
+    </div>`).join("");
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent · Ward Attendance</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="panel">
+        <div class="panel-head"><h2>Today</h2></div>
+        <div id="today-list"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Recent Attendance History</h2></div>
+        <table>
+          <thead><tr><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"parent", active:"parent-attendance.html", title:"Ward Attendance", sub:"Kojo Mensah · JHS 1A" });
+
+  const ward = DB.students[0];
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card"><div class="label">Monthly Attendance</div><div class="value">${ward.attendance}%</div></div>
+    <div class="stat-card"><div class="label">Days Present</div><div class="value">21/22</div></div>
+    <div class="stat-card"><div class="label">Days Late</div><div class="value">1</div></div>
+  `;
+
+  const todayEntry = DB.attendanceToday.find(a=>a.student===ward.name);
+  document.getElementById("today-list").innerHTML = `
+    <div class="list-item">
+      <div><div class="title">${ward.name}</div><div class="meta">Today</div></div>
+      <span class="badge ${badgeFor(todayEntry ? todayEntry.status : "Present")}">${todayEntry ? todayEntry.status : "Present"}</span>
+    </div>`;
+
+  const statuses = ["Present","Present","Present","Late","Present","Absent","Present","Present","Present","Present"];
+  const base = new Date("2026-09-05");
+  const rows = statuses.map((st,i)=>{
+    const d = new Date(base); d.setDate(base.getDate() - i);
+    return { date: d.toISOString().slice(0,10), status: st };
+  });
+  document.getElementById("history-body").innerHTML = rows.map(r=>`
+    <tr><td>${r.date}</td><td><span class="badge ${badgeFor(r.status)}">${r.status}</span></td></tr>`).join("");
+</script>
+</body>
+</html>

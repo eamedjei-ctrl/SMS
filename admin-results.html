@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Results</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+      <button class="btn" onclick="publishAll()">Publish All Approved</button>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="toolbar">
+          <input placeholder="Search results..." style="min-width:220px;">
+          <select><option>All Classes</option></select>
+          <select><option>All Statuses</option><option>Published</option><option>Pending Approval</option></select>
+          <div class="spacer"></div>
+        </div>
+        <table>
+          <thead><tr><th>Student</th><th>Class</th><th>Term</th><th>Average</th><th>Position</th><th>Grade</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"admin", active:"admin-results.html", title:"Results", sub:"Review and approve student results before publishing" });
+
+  function renderRows(){
+    document.getElementById("body").innerHTML = DB.results.map((r,i)=>`
+      <tr>
+        <td>${r.student}</td>
+        <td>${r.class}</td>
+        <td>${r.term}</td>
+        <td>${r.average}</td>
+        <td>${r.position}</td>
+        <td>${r.grade}</td>
+        <td><span class="badge ${badgeFor(r.status)}">${r.status}</span></td>
+        <td>${r.status==="Pending Approval" ? `<button class="btn small" onclick="approve(${i})">Approve</button>` : ""}</td>
+      </tr>`).join("");
+  }
+  function approve(i){ DB.results[i].status = "Approved"; renderRows(); }
+  function publishAll(){
+    DB.results.forEach(r=>{ if (r.status==="Approved") r.status = "Published"; });
+    renderRows();
+  }
+  renderRows();
+</script>
+</body>
+</html>

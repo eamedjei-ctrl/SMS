@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent · Notices &amp; Messages</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>Notices</h2></div>
+        <div id="list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Message the School</h2></div>
+        <div class="field"><textarea id="msg" rows="4" style="width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" placeholder="Type your message to the school office..."></textarea></div>
+        <button class="btn" onclick="sendMsg()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"parent", active:"parent-notices.html", title:"Notices & Messages", sub:"Announcements and communication with the school" });
+
+  const myNotices = DB.notices.filter(n=>n.role==="All"||n.role==="Parent");
+  document.getElementById("list").innerHTML = myNotices.slice().reverse().map(n=>`
+    <div class="panel" style="margin:0;">
+      <div class="panel-head"><h2 style="font-size:15px;">${n.title}</h2><span class="badge blue">${n.role}</span></div>
+      <p style="font-size:13.5px;color:var(--muted);margin:0 0 8px;">${n.body}</p>
+      <div class="meta">${n.date}</div>
+    </div>`).join("");
+
+  function sendMsg(){
+    const t = document.getElementById("msg");
+    if (t.value.trim()){ alert("Message sent (demo only)"); t.value = ""; }
+  }
+</script>
+</body>
+</html>

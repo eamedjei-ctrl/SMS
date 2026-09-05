@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin · Audit Logs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="toolbar">
+          <input placeholder="Search logs..." style="min-width:220px;">
+          <select><option>All Actions</option><option>Login</option><option>Results</option><option>Attendance</option><option>Password</option></select>
+          <input type="date" style="max-width:160px;">
+          <input type="date" style="max-width:160px;">
+          <div class="spacer"></div>
+        </div>
+        <table>
+          <thead><tr><th>User</th><th>Action</th><th>Time</th><th>IP Address</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"superadmin", active:"superadmin-logs.html", title:"Audit Logs", sub:"Full activity trail across the platform" });
+
+  document.getElementById("body").innerHTML = DB.auditLogs.map(l=>`
+    <tr>
+      <td><strong>${l.user}</strong></td>
+      <td>${l.action}</td>
+      <td>${l.time}</td>
+      <td>${l.ip}</td>
+    </tr>`).join("") || `<tr><td colspan="4" class="empty">No log entries</td></tr>`;
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Sign In · School Management System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <h1>Parent Sign In</h1>
+    <p class="sub">Track your ward's progress, attendance and notices</p>
+
+    <div class="error-msg" id="error-msg">Invalid email or password.</div>
+
+    <form id="login-form">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@email.com" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn block">Sign In</button>
+    </form>
+
+    <p class="login-foot">Forgot your password? Contact the school office.</p>
+    <p class="login-foot" style="margin-top:14px;color:#9aa1b5;">
+      Demo: any email/password signs you in as Parent.
+    </p>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <p class="login-foot" style="margin-bottom:6px;">Other portals</p>
+      <p class="login-foot"><a href="admin-login.html">School Admin sign in →</a></p>
+      <p class="login-foot"><a href="teacher-login.html">Teacher sign in →</a></p>
+      <p class="login-foot"><a href="student-login.html">Student sign in →</a></p>
+      <p class="login-foot"><a href="superadmin-login.html">Platform Super Admin sign in →</a></p>
+      <p class="login-foot" style="margin-top:10px;"><a href="index.html">← All portals</a></p>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    if (!email) {
+      document.getElementById("error-msg").style.display = "block";
+      return;
+    }
+    sessionStorage.setItem("sms_session", JSON.stringify({ role: "parent", name: "Yaw Mensah", email }));
+    window.location.href = "parent.html";
+  });
+</script>
+</body>
+</html>

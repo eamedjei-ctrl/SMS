@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student · Timetable</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>Weekly Timetable</h2></div>
+        <table>
+          <thead><tr><th>Time</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"student", active:"student-timetable.html", title:"Timetable", sub:"JHS 1A · Term 1, 2026/2027" });
+
+  document.getElementById("body").innerHTML = DB.timetable.map(t=>`
+    <tr>
+      <td><strong>${t.time}</strong></td>
+      <td>${t.mon}</td>
+      <td>${t.tue}</td>
+      <td>${t.wed}</td>
+      <td>${t.thu}</td>
+      <td>${t.fri}</td>
+    </tr>`).join("");
+</script>
+</body>
+</html>

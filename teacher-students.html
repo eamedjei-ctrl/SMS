@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher · My Students</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="toolbar">
+          <input placeholder="Search students..." style="min-width:220px;">
+          <div class="spacer"></div>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Admission No.</th><th>Class</th><th>Parent</th><th>Attendance</th><th>Avg Score</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const session = renderShell({ role:"teacher", active:"teacher-students.html", title:"My Students", sub:"Students across your assigned classes" });
+
+  const myStudents = studentsForTeacher(session.name);
+
+  document.getElementById("body").innerHTML = myStudents.length ? myStudents.map(s=>`
+    <tr>
+      <td class="row-flex"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></td>
+      <td>${s.admission}</td>
+      <td>${s.class}</td>
+      <td>${s.parent}</td>
+      <td>${s.attendance}%</td>
+      <td>${s.avg}</td>
+    </tr>`).join("") : `<tr><td colspan="6" class="empty">No students assigned to your classes</td></tr>`;
+</script>
+</body>
+</html>

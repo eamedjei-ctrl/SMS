@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Overview</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head"><h2>Recent Admissions</h2><a href="admin-students.html" class="hint">View all →</a></div>
+          <div id="admissions-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Pending Approvals</h2><a href="admin-results.html" class="hint">View all →</a></div>
+          <table><thead><tr><th>Student</th><th>Class</th><th>Avg</th><th></th></tr></thead>
+          <tbody id="pending-body"></tbody></table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Teacher & Student Updates</h2><span class="hint">Scoped to your school — platform-wide logs are Super Admin only</span></div>
+        <div id="updates-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"admin", active:"admin.html", title:"School Overview", sub:"Greenfield High School · Term 1, 2026/2027" });
+
+  const pending = DB.results.filter(r=>r.status==="Pending Approval");
+  const noticesThisTerm = DB.notices.length;
+
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card"><div class="label">Total Students</div><div class="value">${DB.students.length}</div></div>
+    <div class="stat-card"><div class="label">Total Teachers</div><div class="value">${DB.teachers.length}</div></div>
+    <div class="stat-card"><div class="label">Pending Result Approvals</div><div class="value">${pending.length}</div></div>
+    <div class="stat-card"><div class="label">Notices This Term</div><div class="value">${noticesThisTerm}</div></div>
+  `;
+
+  document.getElementById("admissions-list").innerHTML = DB.students.slice(0,4).map(s=>`
+    <div class="list-item">
+      <span class="avatar">${initials(s.name)}</span>
+      <div><div class="title">${s.name}</div><div class="meta">${s.admission} · ${s.class}</div></div>
+    </div>`).join("");
+
+  document.getElementById("pending-body").innerHTML = pending.length ? pending.map(r=>`
+    <tr>
+      <td>${r.student}</td>
+      <td>${r.class}</td>
+      <td>${r.average}</td>
+      <td><button class="btn small" onclick="this.closest('tr').querySelector('.badge')?.remove();this.outerHTML='<span class=\\'badge green\\'>Approved</span>'">Approve</button></td>
+    </tr>`).join("") : `<tr><td colspan="4" class="empty">No pending approvals</td></tr>`;
+
+  const teacherNames = DB.teachers.map(t=>t.name);
+  const studentNames = DB.students.map(s=>s.name);
+  const scopedUpdates = DB.auditLogs.filter(l => teacherNames.includes(l.user) || studentNames.includes(l.user));
+  document.getElementById("updates-list").innerHTML = scopedUpdates.length ? scopedUpdates.map(l=>`
+    <div class="list-item">
+      <div><div class="title">${l.action}</div><div class="meta">${l.user} · ${l.time}</div></div>
+    </div>`).join("") : `<div class="empty">No teacher or student updates yet</div>`;
+</script>
+</body>
+</html>

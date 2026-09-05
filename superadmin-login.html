@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin Sign In · School Management System</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .login-wrap.sa{ background:linear-gradient(135deg,#0d1224 0%,#161b2e 100%); }
+  .sa-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#eef0ff; color:var(--primary);
+    font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:4px 10px; border-radius:20px; margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+<div class="login-wrap sa">
+  <div class="login-card">
+    <span class="sa-badge">● Platform Administration</span>
+    <h1>Super Admin Sign In</h1>
+    <p class="sub">Restricted access — platform owners and operators only</p>
+
+    <div class="error-msg" id="error-msg">Invalid email or password.</div>
+
+    <form id="login-form">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@platform.com" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn block">Sign In as Super Admin</button>
+    </form>
+
+    <p class="login-foot" style="margin-top:14px;"><a href="forgot-password.html?role=superadmin">Forgot password?</a></p>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">
+      <p class="login-foot"><a href="superadmin-signup.html">Sign up as Super Admin →</a></p>
+      <p class="login-foot" style="margin-top:10px;"><a href="index.html">← All portals</a></p>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    if (!email) {
+      document.getElementById("error-msg").style.display = "block";
+      return;
+    }
+    sessionStorage.setItem("sms_session", JSON.stringify({ role: "superadmin", name: "Efua Amedjei", email }));
+    window.location.href = "superadmin.html";
+  });
+</script>
+</body>
+</html>

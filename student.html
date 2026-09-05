@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student · Overview</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel" id="profile-card"></div>
+      <div class="stat-grid" id="stats"></div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head"><h2>Today's Timetable</h2><a href="student-timetable.html" class="hint">Full timetable →</a></div>
+          <table><thead><tr><th>Time</th><th>Subject</th></tr></thead>
+          <tbody id="timetable-body"></tbody></table>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Notices</h2><a href="student-notices.html" class="hint">View all →</a></div>
+          <div id="notices-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"student", active:"student.html", title:"My Overview", sub:"Welcome back!" });
+
+  const me = DB.students[0];
+  document.getElementById("profile-card").innerHTML = `
+    <div class="row-flex" style="gap:16px;">
+      <span class="avatar" style="width:52px;height:52px;font-size:18px;">${initials(me.name)}</span>
+      <div>
+        <div class="title" style="font-size:17px;">${me.name}</div>
+        <div class="meta">${me.class} · Admission No. ${me.admission}</div>
+      </div>
+    </div>
+  `;
+
+  const pending = DB.assignments.filter(a=>a.status==="Pending").length;
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card"><div class="label">Attendance</div><div class="value">${me.attendance}%</div></div>
+    <div class="stat-card"><div class="label">Current Average</div><div class="value">${me.avg}</div></div>
+    <div class="stat-card"><div class="label">Pending Assignments</div><div class="value">${pending}</div></div>
+  `;
+
+  document.getElementById("timetable-body").innerHTML = DB.timetable.map(t=>`
+    <tr><td>${t.time}</td><td>${t.mon}</td></tr>`).join("");
+
+  const myNotices = DB.notices.filter(n=>n.role==="All"||n.role==="Student");
+  document.getElementById("notices-list").innerHTML = myNotices.slice().reverse().slice(0,3).map(n=>`
+    <div class="list-item">
+      <div><div class="title">${n.title}</div><div class="meta">${n.date}</div></div>
+      <span class="badge blue">${n.role}</span>
+    </div>`).join("");
+</script>
+</body>
+</html>

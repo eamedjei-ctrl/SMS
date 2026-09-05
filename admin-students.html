@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Students</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+      <button class="btn" onclick="document.getElementById('new-admission-form').classList.toggle('open-form')">+ New Admission</button>
+    </div>
+    <div class="content">
+      <div class="panel" id="new-admission-form" style="display:none;">
+        <div class="panel-head"><h2>New Admission</h2></div>
+        <div class="toolbar">
+          <input placeholder="Student name" style="flex:1;">
+          <select id="class-select"></select>
+          <input placeholder="Parent name" style="flex:1;">
+          <select><option>Male</option><option>Female</option></select>
+          <input type="date" style="max-width:160px;">
+          <button class="btn">Save Admission</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <input placeholder="Search students..." style="min-width:220px;">
+          <select id="class-filter"><option>All Classes</option></select>
+          <select><option>All Statuses</option><option>Active</option><option>Probation</option></select>
+          <div class="spacer"></div>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Admission No.</th><th>Class</th><th>Parent</th><th>Attendance</th><th>Avg Score</th><th>Status</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"admin", active:"admin-students.html", title:"Students", sub:"All enrolled students at Greenfield High School" });
+
+  const classOptions = DB.classes.map(c=>`<option>${c.name}</option>`).join("");
+  document.getElementById("class-select").innerHTML = classOptions;
+  document.getElementById("class-filter").innerHTML = `<option>All Classes</option>` + classOptions;
+
+  document.getElementById("body").innerHTML = DB.students.map(s=>`
+    <tr>
+      <td class="row-flex"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></td>
+      <td>${s.admission}</td>
+      <td>${s.class}</td>
+      <td>${s.parent}</td>
+      <td>${s.attendance}%</td>
+      <td>${s.avg}</td>
+      <td><span class="badge ${badgeFor(s.status)}">${s.status}</span></td>
+    </tr>`).join("");
+</script>
+<style>#new-admission-form.open-form{display:block !important;}</style>
+</body>
+</html>

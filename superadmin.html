@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin · Overview</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="stat-grid" id="stats"></div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head"><h2>Schools</h2><a href="superadmin-schools.html" class="hint">Manage all →</a></div>
+          <table><thead><tr><th>School</th><th>Students</th><th>Staff</th><th>Status</th></tr></thead>
+          <tbody id="schools-body"></tbody></table>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Recent Activity</h2><a href="superadmin-logs.html" class="hint">View logs →</a></div>
+          <div id="activity-list"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Platform Health</h2></div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="label">Uptime (30d)</div><div class="value">99.95%</div></div>
+          <div class="stat-card"><div class="label">Last Backup</div><div class="value">Today, 03:00</div></div>
+          <div class="stat-card"><div class="label">Failed Logins (24h)</div><div class="value">3</div></div>
+          <div class="stat-card"><div class="label">Active Integrations</div><div class="value">SMS, Email</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"superadmin", active:"superadmin.html", title:"Platform Overview", sub:"System-wide status across all schools" });
+
+  const totalStudents = DB.schools.reduce((a,s)=>a+s.students,0);
+  const totalStaff = DB.schools.reduce((a,s)=>a+s.staff,0);
+  document.getElementById("stats").innerHTML = `
+    <div class="stat-card"><div class="label">Schools</div><div class="value">${DB.schools.length}</div><div class="delta">1 new this term</div></div>
+    <div class="stat-card"><div class="label">Total Students</div><div class="value">${totalStudents}</div></div>
+    <div class="stat-card"><div class="label">Total Staff</div><div class="value">${totalStaff}</div></div>
+    <div class="stat-card"><div class="label">Active Admins</div><div class="value">${DB.admins.filter(a=>a.status==='Active').length}</div></div>
+  `;
+
+  document.getElementById("schools-body").innerHTML = DB.schools.map(s=>`
+    <tr>
+      <td><strong>${s.name}</strong><div class="meta" style="color:#6b7385;font-size:12px;">${s.address}</div></td>
+      <td>${s.students}</td>
+      <td>${s.staff}</td>
+      <td><span class="badge ${badgeFor(s.status)}">${s.status}</span></td>
+    </tr>`).join("");
+
+  document.getElementById("activity-list").innerHTML = DB.auditLogs.map(l=>`
+    <div class="list-item">
+      <div><div class="title">${l.action}</div><div class="meta">${l.user} · ${l.time}</div></div>
+    </div>`).join("");
+</script>
+</body>
+</html>

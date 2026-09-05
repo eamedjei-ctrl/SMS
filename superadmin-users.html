@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin · Admins &amp; Users</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+      <button class="btn" onclick="document.getElementById('new-admin-form').classList.toggle('open-form')">+ New Admin</button>
+    </div>
+    <div class="content">
+      <div class="panel" id="new-admin-form" style="display:none;">
+        <div class="panel-head"><h2>Create Admin</h2></div>
+        <div class="toolbar">
+          <input placeholder="Full name" style="flex:1;">
+          <input placeholder="Email" style="flex:1;">
+          <select id="school-select"></select>
+          <select><option>School Admin</option><option>Super Admin</option></select>
+          <button class="btn">Save Admin</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <input placeholder="Search admins..." style="min-width:220px;">
+          <select><option>All Schools</option></select>
+          <select><option>All Statuses</option><option>Active</option><option>Suspended</option></select>
+          <div class="spacer"></div>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>School</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Role Permissions</h2><div class="sub">Illustrative only — not editable in this prototype</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+          <label class="list-item"><input type="checkbox" checked disabled> Can approve results</label>
+          <label class="list-item"><input type="checkbox" checked disabled> Can manage teachers</label>
+          <label class="list-item"><input type="checkbox" checked disabled> Can manage students</label>
+          <label class="list-item"><input type="checkbox" disabled> Can manage other admins</label>
+          <label class="list-item"><input type="checkbox" checked disabled> Can publish notices</label>
+          <label class="list-item"><input type="checkbox" disabled> Can access billing</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"superadmin", active:"superadmin-users.html", title:"Admins & Users", sub:"Manage school administrator accounts" });
+
+  document.getElementById("school-select").innerHTML = DB.schools.map(s=>`<option>${s.name}</option>`).join("");
+
+  document.getElementById("body").innerHTML = DB.admins.map(a=>`
+    <tr>
+      <td class="row-flex"><span class="avatar">${initials(a.name)}</span> <strong>${a.name}</strong></td>
+      <td>${a.email}</td>
+      <td>${a.school}</td>
+      <td><span class="badge ${badgeFor(a.status)}">${a.status}</span></td>
+      <td>
+        <button class="btn ghost small">Edit</button>
+        <button class="btn ghost small">Reset Password</button>
+        <button class="btn ${a.status==='Active'?'danger':'ghost'} small">${a.status==='Active'?'Suspend':'Activate'}</button>
+      </td>
+    </tr>`).join("");
+</script>
+<style>#new-admin-form.open-form{display:block !important;} .list-item{gap:8px;align-items:center;}</style>
+</body>
+</html>

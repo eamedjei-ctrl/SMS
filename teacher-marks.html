@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher · Marks Entry</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>Enter Marks</h2></div>
+        <div class="toolbar">
+          <select id="subject-select"></select>
+          <input placeholder="Assessment type (e.g. CA Test 1)" style="flex:1;">
+          <select><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Admission No.</th><th>Class</th><th>Score (/100)</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+        <button class="btn" style="margin-top:14px;" onclick="alert('Marks submitted (demo only)')">Submit Marks</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Recent Entries</h2></div>
+        <table>
+          <thead><tr><th>Student</th><th>Subject</th><th>Type</th><th>Score</th><th>Term</th></tr></thead>
+          <tbody id="recent-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const session = renderShell({ role:"teacher", active:"teacher-marks.html", title:"Marks Entry", sub:"Record assessment scores for your students" });
+
+  const myStudents = studentsForTeacher(session.name);
+
+  document.getElementById("subject-select").innerHTML = DB.subjects.map(s=>`<option>${s}</option>`).join("");
+
+  document.getElementById("body").innerHTML = myStudents.length ? myStudents.map(s=>`
+    <tr>
+      <td class="row-flex"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></td>
+      <td>${s.admission}</td>
+      <td>${s.class}</td>
+      <td><input type="number" min="0" max="100" placeholder="--" style="width:80px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;"></td>
+    </tr>`).join("") : `<tr><td colspan="4" class="empty">No students assigned to your classes</td></tr>`;
+
+  const myStudentNames = myStudents.map(s=>s.name);
+  const myRecentEntries = DB.assessments.filter(a=>myStudentNames.includes(a.student));
+  document.getElementById("recent-body").innerHTML = myRecentEntries.length ? myRecentEntries.map(a=>`
+    <tr>
+      <td>${a.student}</td>
+      <td>${a.subject}</td>
+      <td>${a.type}</td>
+      <td>${a.score}/${a.max}</td>
+      <td>${a.term}</td>
+    </tr>`).join("") : `<tr><td colspan="5" class="empty">No recent entries for your students</td></tr>`;
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Teachers</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+      <button class="btn" onclick="document.getElementById('new-teacher-form').classList.toggle('open-form')">+ Add Teacher</button>
+    </div>
+    <div class="content">
+      <div class="panel" id="new-teacher-form" style="display:none;">
+        <div class="panel-head"><h2>Add Teacher</h2></div>
+        <div class="toolbar">
+          <input placeholder="Full name" style="flex:1;">
+          <input placeholder="Staff No." style="max-width:140px;">
+          <input placeholder="Department" style="flex:1;">
+          <input placeholder="Qualification" style="flex:1;">
+          <button class="btn">Save Teacher</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <input placeholder="Search teachers..." style="min-width:220px;">
+          <div class="spacer"></div>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Staff No.</th><th>Department</th><th>Classes Taught</th><th>Qualification</th><th>Actions</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"admin", active:"admin-teachers.html", title:"Teachers", sub:"Manage teaching staff at Greenfield High School" });
+
+  document.getElementById("body").innerHTML = DB.teachers.map(t=>`
+    <tr>
+      <td class="row-flex"><span class="avatar">${initials(t.name)}</span> <strong>${t.name}</strong></td>
+      <td>${t.staffNo}</td>
+      <td>${t.dept}</td>
+      <td>${t.classes.join(", ")}</td>
+      <td>${t.qualification}</td>
+      <td><button class="btn ghost small">Assign Class</button></td>
+    </tr>`).join("");
+</script>
+<style>#new-teacher-form.open-form{display:block !important;}</style>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Management System</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .hub-wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#3b5bfd 0%,#7b3bfd 100%);
+    padding:40px 20px;
+  }
+  .hub-card{
+    background:var(--surface);
+    border-radius:20px;
+    padding:44px 40px;
+    width:100%;
+    max-width:840px;
+    box-shadow:0 20px 60px rgba(20,20,60,.25);
+  }
+  .hub-card h1{font-size:24px;margin-bottom:6px;text-align:center;}
+  .hub-card p.sub{color:var(--muted);font-size:14px;text-align:center;margin-bottom:32px;}
+  .portal-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:16px;
+  }
+  .portal-card{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:22px 20px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    text-decoration:none;
+    color:var(--text);
+    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  }
+  .portal-card:hover{
+    border-color:var(--primary);
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(59,91,253,.12);
+  }
+  .portal-card .icon{
+    width:42px;height:42px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+    background:#eaefff;color:var(--primary);
+  }
+  .portal-card.sa .icon{background:#161b2e;color:#fff;}
+  .portal-card h2{font-size:16px;}
+  .portal-card p{font-size:12.5px;color:var(--muted);line-height:1.4;}
+  .portal-card .go{font-size:12.5px;font-weight:600;color:var(--primary);margin-top:auto;}
+</style>
+</head>
+<body>
+<div class="hub-wrap">
+  <div class="hub-card">
+    <h1>School Management System</h1>
+    <p class="sub">Choose your portal to sign in</p>
+
+    <div class="portal-grid">
+      <a class="portal-card sa" href="superadmin-login.html">
+        <span class="icon">◆</span>
+        <h2>Super Admin Portal</h2>
+        <p>Platform-wide control: schools, admins, permissions, audit logs, backups and integrations.</p>
+        <span class="go">Sign in →</span>
+      </a>
+
+      <a class="portal-card" href="admin-login.html">
+        <span class="icon">🏫</span>
+        <h2>School Admin Portal</h2>
+        <p>Manage your school's teachers, students, classes, results and notices.</p>
+        <span class="go">Sign in →</span>
+      </a>
+
+      <a class="portal-card" href="teacher-login.html">
+        <span class="icon">🧑‍🏫</span>
+        <h2>Teacher Portal</h2>
+        <p>Attendance, marks entry and assignments for your assigned classes only.</p>
+        <span class="go">Sign in →</span>
+      </a>
+
+      <a class="portal-card" href="student-login.html">
+        <span class="icon">🎓</span>
+        <h2>Student Portal</h2>
+        <p>Your own results, timetable, assignments and notices — nothing else.</p>
+        <span class="go">Sign in →</span>
+      </a>
+
+      <a class="portal-card" href="parent-login.html">
+        <span class="icon">👪</span>
+        <h2>Parent Portal</h2>
+        <p>Your ward's results, attendance and notices only.</p>
+        <span class="go">Sign in →</span>
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Notices</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>New Notice</h2></div>
+        <div class="field"><label>Title</label><input id="n-title" placeholder="Notice title"></div>
+        <div class="field"><label>Body</label><textarea id="n-body" rows="3" style="width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" placeholder="Notice content..."></textarea></div>
+        <div class="two-col">
+          <div class="field"><label>Target Role</label>
+            <select id="n-role"><option>All</option><option>Student</option><option>Parent</option><option>Teacher</option></select>
+          </div>
+          <div></div>
+        </div>
+        <button class="btn" onclick="publishNotice()">Publish Notice</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Published Notices</h2></div>
+        <div id="notices-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"admin", active:"admin-notices.html", title:"Notices", sub:"Publish and manage school-wide notices" });
+
+  function renderNotices(){
+    document.getElementById("notices-list").innerHTML = DB.notices.slice().reverse().map(n=>`
+      <div class="panel" style="margin:0;">
+        <div class="panel-head"><h2 style="font-size:15px;">${n.title}</h2><span class="badge blue">${n.role}</span></div>
+        <p style="font-size:13.5px;color:var(--muted);margin:0 0 8px;">${n.body}</p>
+        <div class="meta">${n.date}</div>
+      </div>`).join("");
+  }
+  function publishNotice(){
+    const title = document.getElementById("n-title").value.trim();
+    const body = document.getElementById("n-body").value.trim();
+    const role = document.getElementById("n-role").value;
+    if (!title) return;
+    DB.notices.push({ title, body, role, date: new Date().toISOString().slice(0,10) });
+    document.getElementById("n-title").value = "";
+    document.getElementById("n-body").value = "";
+    renderNotices();
+  }
+  renderNotices();
+</script>
+</body>
+</html>

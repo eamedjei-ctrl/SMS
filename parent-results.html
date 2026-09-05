@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent · Ward Results</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel" id="highlight"></div>
+      <div class="panel">
+        <div class="panel-head"><h2>Term Results</h2></div>
+        <table>
+          <thead><tr><th>Class</th><th>Term</th><th>Average</th><th>Position</th><th>Grade</th><th>Status</th></tr></thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Subject Breakdown</h2></div>
+        <div id="subjects-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"parent", active:"parent-results.html", title:"Ward Results", sub:"Kojo Mensah · JHS 1A" });
+
+  const ward = DB.students[0];
+  const result = DB.results.find(r=>r.student===ward.name);
+  document.getElementById("highlight").innerHTML = result ? `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="label">Term</div><div class="value">${result.term}</div></div>
+      <div class="stat-card"><div class="label">Average</div><div class="value">${result.average}</div></div>
+      <div class="stat-card"><div class="label">Position</div><div class="value">${result.position}</div></div>
+      <div class="stat-card"><div class="label">Grade</div><div class="value">${result.grade}</div></div>
+    </div>` : `<div class="empty">No results yet</div>`;
+
+  document.getElementById("results-body").innerHTML = DB.results.filter(r=>r.student===ward.name).map(r=>`
+    <tr>
+      <td>${r.class}</td><td>${r.term}</td><td>${r.average}</td><td>${r.position}</td><td>${r.grade}</td>
+      <td><span class="badge ${badgeFor(r.status)}">${r.status}</span></td>
+    </tr>`).join("") || `<tr><td colspan="6" class="empty">No results yet</td></tr>`;
+
+  const myAssessments = DB.assessments.filter(a=>a.student===ward.name);
+  document.getElementById("subjects-list").innerHTML = myAssessments.length ? myAssessments.map(a=>`
+    <div class="list-item" style="flex-direction:column;align-items:stretch;gap:6px;">
+      <div class="row-flex" style="justify-content:space-between;">
+        <div class="title">${a.subject} <span class="meta">(${a.type})</span></div>
+        <div class="meta">${a.score}/${a.max}</div>
+      </div>
+      <div class="progress"><span style="width:${(a.score/a.max*100).toFixed(0)}%"></span></div>
+    </div>`).join("") : `<div class="empty">No assessment scores recorded yet</div>`;
+</script>
+</body>
+</html>

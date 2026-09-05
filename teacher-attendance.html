@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher · Attendance</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+      <button class="btn" onclick="alert('Attendance saved (demo only)')">Save Attendance</button>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="toolbar">
+          <select id="class-select"></select>
+          <input type="date" style="max-width:160px;">
+          <div class="spacer"></div>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Admission No.</th><th>Class</th><th>Status</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const session = renderShell({ role:"teacher", active:"teacher-attendance.html", title:"Attendance", sub:"Mark daily attendance for your class" });
+
+  const myClasses = classesForTeacher(session.name);
+  const myStudents = studentsForTeacher(session.name);
+
+  document.getElementById("class-select").innerHTML = myClasses.map(c=>`<option>${c}</option>`).join("");
+
+  const statuses = ["Present","Absent","Late"];
+  document.getElementById("body").innerHTML = myStudents.length ? myStudents.map(s=>`
+    <tr>
+      <td class="row-flex"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></td>
+      <td>${s.admission}</td>
+      <td>${s.class}</td>
+      <td>
+        <div class="row-flex" style="gap:6px;">
+          ${statuses.map(st=>`<button type="button" class="btn ${st===('Present')?'':'ghost'} small" onclick="selectStatus(this)">${st}</button>`).join("")}
+        </div>
+      </td>
+    </tr>`).join("") : `<tr><td colspan="4" class="empty">No students assigned to your classes</td></tr>`;
+
+  function selectStatus(btn){
+    const row = btn.closest("tr");
+    row.querySelectorAll("button").forEach(b=>{ b.classList.add("ghost"); });
+    btn.classList.remove("ghost");
+  }
+</script>
+</body>
+</html>

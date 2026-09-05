@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin Sign Up · School Management System</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .login-wrap.sa{ background:linear-gradient(135deg,#0d1224 0%,#161b2e 100%); }
+  .sa-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#eef0ff; color:var(--primary);
+    font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:4px 10px; border-radius:20px; margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+<div class="login-wrap sa">
+  <div class="login-card">
+    <span class="sa-badge">● Platform Administration</span>
+    <h1>Create Super Admin Account</h1>
+    <p class="sub">Restricted access — platform owners and operators only</p>
+
+    <div class="error-msg" id="error-msg">Please fill in all fields correctly.</div>
+
+    <form id="signup-form">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="Your name" required>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@platform.com" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required minlength="8">
+      </div>
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" id="confirm-password" placeholder="••••••••" required minlength="8">
+      </div>
+      <button type="submit" class="btn block">Create Super Admin Account</button>
+    </form>
+
+    <p class="login-foot" style="margin-top:14px;"><a href="superadmin-login.html">← Already have an account? Sign in</a></p>
+  </div>
+</div>
+
+<script>
+  document.getElementById("signup-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirm-password").value;
+    const errorMsg = document.getElementById("error-msg");
+
+    if (!name || !email || password.length < 8 || password !== confirmPassword) {
+      errorMsg.style.display = "block";
+      return;
+    }
+    sessionStorage.setItem("sms_session", JSON.stringify({ role: "superadmin", name, email }));
+    window.location.href = "superadmin.html";
+  });
+</script>
+</body>
+</html>

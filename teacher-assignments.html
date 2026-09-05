@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher · Assignments</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+      <button class="btn" onclick="document.getElementById('new-assignment-form').classList.toggle('open-form')">+ New Assignment</button>
+    </div>
+    <div class="content">
+      <div class="panel" id="new-assignment-form" style="display:none;">
+        <div class="panel-head"><h2>New Assignment</h2></div>
+        <div class="toolbar">
+          <input placeholder="Assignment title" style="flex:1;">
+          <select id="subject-select"></select>
+          <input type="date" style="max-width:160px;">
+          <button class="btn">Save Assignment</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Assignments</h2></div>
+        <table>
+          <thead><tr><th>Title</th><th>Subject</th><th>Due Date</th><th>Status</th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"teacher", active:"teacher-assignments.html", title:"Assignments", sub:"Manage assignments for your classes" });
+
+  document.getElementById("subject-select").innerHTML = DB.subjects.map(s=>`<option>${s}</option>`).join("");
+
+  document.getElementById("body").innerHTML = DB.assignments.map(a=>`
+    <tr>
+      <td><strong>${a.title}</strong></td>
+      <td>${a.subject}</td>
+      <td>${a.due}</td>
+      <td><span class="badge ${badgeFor(a.status)}">${a.status}</span></td>
+    </tr>`).join("");
+</script>
+<style>#new-assignment-form.open-form{display:block !important;}</style>
+</body>
+</html>
