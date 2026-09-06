@@ -13,7 +13,7 @@
       <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
         <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
       </div>
-      <button class="btn" onclick="alert('Attendance saved (demo only)')">Save Attendance</button>
+      <button class="btn" id="save-attendance-btn">Save Attendance</button>
     </div>
     <div class="content">
       <div class="panel">
@@ -41,23 +41,40 @@
   document.getElementById("class-select").innerHTML = myClasses.map(c=>`<option>${c}</option>`).join("");
 
   const statuses = ["Present","Absent","Late"];
-  document.getElementById("body").innerHTML = myStudents.length ? myStudents.map(s=>`
-    <tr>
+  document.getElementById("body").innerHTML = myStudents.length ? myStudents.map(s=>{
+    const existing = DB.attendanceToday.find(a=>a.student===s.name);
+    const current = existing ? existing.status : "Present";
+    return `
+    <tr data-student="${s.name}">
       <td class="row-flex"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></td>
       <td>${s.admission}</td>
       <td>${s.class}</td>
       <td>
         <div class="row-flex" style="gap:6px;">
-          ${statuses.map(st=>`<button type="button" class="btn ${st===('Present')?'':'ghost'} small" onclick="selectStatus(this)">${st}</button>`).join("")}
+          ${statuses.map(st=>`<button type="button" class="btn ${st===current?'':'ghost'} small" data-status="${st}" onclick="selectStatus(this)">${st}</button>`).join("")}
         </div>
       </td>
-    </tr>`).join("") : `<tr><td colspan="4" class="empty">No students assigned to your classes</td></tr>`;
+    </tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">No students assigned to your classes</td></tr>`;
 
   function selectStatus(btn){
     const row = btn.closest("tr");
     row.querySelectorAll("button").forEach(b=>{ b.classList.add("ghost"); });
     btn.classList.remove("ghost");
   }
+
+  document.getElementById("save-attendance-btn").addEventListener("click", () => {
+    document.querySelectorAll("#body tr[data-student]").forEach(row => {
+      const student = row.dataset.student;
+      const activeBtn = row.querySelector("button:not(.ghost)");
+      const status = activeBtn ? activeBtn.dataset.status : "Present";
+      const i = DB.attendanceToday.findIndex(a=>a.student===student);
+      if (i >= 0) DB.attendanceToday[i].status = status;
+      else DB.attendanceToday.push({ student, status });
+    });
+    persistRecords();
+    alert("Attendance saved.");
+  });
 </script>
 </body>
 </html>

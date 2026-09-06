@@ -13,11 +13,24 @@
       <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
         <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
       </div>
+      <button class="btn" onclick="document.getElementById('add-student-form').classList.toggle('open-form')">+ Add Student</button>
     </div>
     <div class="content">
+      <div class="panel" id="add-student-form" style="display:none;">
+        <div class="panel-head"><h2>Add Student</h2></div>
+        <div class="toolbar">
+          <input id="new-name" placeholder="Student name" style="flex:1;">
+          <input id="new-admission" placeholder="Admission No." style="max-width:140px;">
+          <select id="new-class"></select>
+          <input id="new-parent" placeholder="Parent name" style="flex:1;">
+          <select id="new-gender"><option>Male</option><option>Female</option></select>
+          <button class="btn" id="save-student">Save Student</button>
+        </div>
+        <div class="empty" id="add-student-msg" style="display:none;"></div>
+      </div>
       <div class="panel">
         <div class="toolbar">
-          <input placeholder="Search students..." style="min-width:220px;">
+          <input id="search-input" placeholder="Search students..." style="min-width:220px;">
           <div class="spacer"></div>
         </div>
         <table>
@@ -33,17 +46,55 @@
 <script>
   const session = renderShell({ role:"teacher", active:"teacher-students.html", title:"My Students", sub:"Students across your assigned classes" });
 
-  const myStudents = studentsForTeacher(session.name);
+  const myClasses = classesForTeacher(session.name);
+  document.getElementById("new-class").innerHTML = myClasses.map(c=>`<option>${c}</option>`).join("");
 
-  document.getElementById("body").innerHTML = myStudents.length ? myStudents.map(s=>`
-    <tr>
-      <td class="row-flex"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></td>
-      <td>${s.admission}</td>
-      <td>${s.class}</td>
-      <td>${s.parent}</td>
-      <td>${s.attendance}%</td>
-      <td>${s.avg}</td>
-    </tr>`).join("") : `<tr><td colspan="6" class="empty">No students assigned to your classes</td></tr>`;
+  const search = document.getElementById("search-input");
+
+  function render(filter=""){
+    const list = studentsForTeacher(session.name).filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
+    document.getElementById("body").innerHTML = list.length ? list.map(s=>`
+      <tr>
+        <td class="row-flex"><a href="teacher-student-record.html?id=${s.id}" class="row-flex" style="gap:8px;color:inherit;text-decoration:none;"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></a></td>
+        <td>${s.admission}</td>
+        <td>${s.class}</td>
+        <td>${s.parent}</td>
+        <td>${s.attendance}%</td>
+        <td>${s.avg}</td>
+      </tr>`).join("") : `<tr><td colspan="6" class="empty">No students found</td></tr>`;
+  }
+  render();
+  search.addEventListener("input", () => render(search.value));
+
+  const msg = document.getElementById("add-student-msg");
+  document.getElementById("save-student").addEventListener("click", () => {
+    const name = document.getElementById("new-name").value.trim();
+    const admission = document.getElementById("new-admission").value.trim();
+    const className = document.getElementById("new-class").value;
+    const parent = document.getElementById("new-parent").value.trim();
+    const gender = document.getElementById("new-gender").value === "Male" ? "M" : "F";
+
+    if (!name || !admission || !className) {
+      msg.textContent = "Please fill in student name, admission number, and class.";
+      msg.style.display = "block";
+      return;
+    }
+    if (DB.students.some(s => s.admission.toLowerCase() === admission.toLowerCase())) {
+      msg.textContent = "A student with that admission number already exists.";
+      msg.style.display = "block";
+      return;
+    }
+
+    addStudent({ name, admission, class: className, parent, gender });
+
+    document.getElementById("new-name").value = "";
+    document.getElementById("new-admission").value = "";
+    document.getElementById("new-parent").value = "";
+    msg.style.display = "none";
+    document.getElementById("add-student-form").classList.remove("open-form");
+    render(search.value);
+  });
 </script>
+<style>#add-student-form.open-form{display:block !important;}</style>
 </body>
 </html>

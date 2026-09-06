@@ -27,6 +27,15 @@
           <div id="result-panel"></div>
         </div>
       </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Quick Links</h2></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
+          <a href="parent-timetable.html" class="list-item" style="text-decoration:none;color:inherit;"><div><div class="title">🕘 Timetable</div><div class="meta">Weekly class schedule</div></div></a>
+          <a href="parent-assignments.html" class="list-item" style="text-decoration:none;color:inherit;"><div><div class="title">📚 Assignments</div><div class="meta">Homework &amp; due dates</div></div></a>
+          <a href="parent-fees.html" class="list-item" style="text-decoration:none;color:inherit;"><div><div class="title">💳 School Fees</div><div class="meta" id="fees-hint">Statements from the school</div></div></a>
+          <a href="parent-reports.html" class="list-item" style="text-decoration:none;color:inherit;"><div><div class="title">📄 Reports</div><div class="meta" id="reports-hint">Report cards from the school</div></div></a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -66,6 +75,11 @@
       <div><div class="title">${result.class} · ${result.term}</div><div class="meta">Position ${result.position} · Grade ${result.grade}</div></div>
       <span class="badge ${badgeFor(result.status)}">${result.status}</span>
     </div>` : `<div class="empty">No results yet</div>`;
+
+  const myFees = feesForClass(ward.class);
+  document.getElementById("fees-hint").textContent = myFees.length ? `${myFees.length} statement${myFees.length===1?"":"s"} available` : "No statements yet";
+  const myReports = reportsForStudent(ward.name);
+  document.getElementById("reports-hint").textContent = myReports.length ? `${myReports.length} report${myReports.length===1?"":"s"} available` : "No reports yet";
 </script>
 </body>
 </html>

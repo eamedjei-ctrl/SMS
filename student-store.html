@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student · School Store</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="toolbar">
+          <select id="category-filter"><option>All Categories</option></select>
+          <div class="spacer"></div>
+        </div>
+        <div id="items-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Cart</h2></div>
+        <div id="cart-list"></div>
+        <div class="row-flex" style="justify-content:space-between;margin-top:14px;">
+          <strong>Total: GH₵ <span id="cart-total">0</span></strong>
+          <button class="btn" id="place-order" disabled>Place Order</button>
+        </div>
+        <div class="empty" id="order-msg" style="display:none;"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>My Orders</h2></div>
+        <table>
+          <thead><tr><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const me = DB.students[0];
+  renderShell({ role:"student", active:"student-store.html", title:"School Store", sub:"Order uniforms, books and stationery" });
+
+  const categories = [...new Set(DB.storeItems.map(i=>i.category))];
+  document.getElementById("category-filter").innerHTML = `<option>All Categories</option>` + categories.map(c=>`<option>${c}</option>`).join("");
+
+  const cart = {};
+
+  function renderItems(filter="All Categories"){
+    const list = DB.storeItems.filter(i => filter==="All Categories" || i.category===filter);
+    document.getElementById("items-grid").innerHTML = list.map(i=>`
+      <div class="panel" style="margin:0;">
+        <div class="panel-head"><h2 style="font-size:15px;">${i.name}</h2><span class="badge blue">${i.category}</span></div>
+        <div class="meta">GH₵ ${i.price} · ${i.stock} in stock</div>
+        <div class="row-flex" style="margin-top:10px;justify-content:space-between;">
+          <input type="number" min="0" max="${i.stock}" value="${cart[i.id]||0}" data-id="${i.id}" class="qty-input" style="width:70px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;" ${i.stock===0?"disabled":""}>
+          <span class="meta">${i.stock===0?"Out of stock":""}</span>
+        </div>
+      </div>`).join("") || `<div class="empty">No items in this category</div>`;
+
+    document.querySelectorAll(".qty-input").forEach(input => {
+      input.addEventListener("input", () => {
+        const id = Number(input.dataset.id);
+        const item = DB.storeItems.find(i=>i.id===id);
+        let qty = Math.max(0, Math.min(item.stock, Number(input.value) || 0));
+        input.value = qty;
+        if (qty === 0) delete cart[id]; else cart[id] = qty;
+        renderCart();
+      });
+    });
+  }
+
+  function renderCart(){
+    const entries = Object.entries(cart);
+    document.getElementById("cart-list").innerHTML = entries.length ? entries.map(([id, qty])=>{
+      const item = DB.storeItems.find(i=>i.id===Number(id));
+      return `<div class="list-item">
+        <div><div class="title">${item.name}</div><div class="meta">Qty ${qty} × GH₵ ${item.price}</div></div>
+        <div>GH₵ ${item.price*qty}</div>
+      </div>`;
+    }).join("") : `<div class="empty">Your cart is empty</div>`;
+
+    const total = entries.reduce((sum,[id,qty]) => sum + DB.storeItems.find(i=>i.id===Number(id)).price * qty, 0);
+    document.getElementById("cart-total").textContent = total;
+    document.getElementById("place-order").disabled = entries.length === 0;
+  }
+
+  function renderOrders(){
+    const myOrders = ordersForStudent(me.name);
+    document.getElementById("orders-body").innerHTML = myOrders.length ? myOrders.slice().reverse().map(o=>`
+      <tr>
+        <td>${o.date}</td>
+        <td>${o.items.map(i=>`${i.name} ×${i.qty}`).join(", ")}</td>
+        <td>GH₵ ${o.total}</td>
+        <td><span class="badge ${badgeFor(o.status)}">${o.status}</span></td>
+      </tr>`).join("") : `<tr><td colspan="4" class="empty">No orders placed yet</td></tr>`;
+  }
+
+  document.getElementById("category-filter").addEventListener("change", (e) => renderItems(e.target.value));
+
+  document.getElementById("place-order").addEventListener("click", () => {
+    const cartArr = Object.entries(cart).map(([id, qty]) => ({ id: Number(id), qty }));
+    if (!cartArr.length) return;
+    placeStoreOrder(me.name, cartArr);
+    Object.keys(cart).forEach(k => delete cart[k]);
+    document.getElementById("order-msg").textContent = "Order placed! Collect your items from the school store.";
+    document.getElementById("order-msg").style.display = "block";
+    renderItems(document.getElementById("category-filter").value);
+    renderCart();
+    renderOrders();
+  });
+
+  renderItems();
+  renderCart();
+  renderOrders();
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent · School Fees</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>Fee Statements</h2></div>
+        <div id="fees-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"parent", active:"parent-fees.html", title:"School Fees", sub:"Fee statements uploaded by the school" });
+
+  const ward = DB.students[0];
+  const myFees = feesForClass(ward.class);
+
+  document.getElementById("fees-list").innerHTML = myFees.length ? myFees.slice().reverse().map(f=>`
+    <div class="list-item">
+      <div>
+        <div class="title">${f.title}</div>
+        <div class="meta">${f.class} · ${f.term} · Uploaded ${f.uploadedAt}</div>
+      </div>
+      <a class="btn small" href="${f.fileData}" download="${f.fileName}">Download</a>
+    </div>`).join("") : `<div class="empty">No fee statements have been uploaded yet</div>`;
+</script>
+</body>
+</html>

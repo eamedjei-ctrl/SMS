@@ -72,7 +72,124 @@ const DB = {
     { title: "Essay: My Community", subject: "English Language", due: "2026-09-10", status: "Pending" },
     { title: "Lab report - States of Matter", subject: "Integrated Science", due: "2026-09-06", status: "Overdue" },
   ],
+  fees: [],
+  reports: [],
+  // School store/POS catalogue — inspired by boarding-school portals that let
+  // students order uniforms, books, and stationery online.
+  storeItems: [
+    { id: 1, name: "School Uniform (Full Set)", category: "Uniform", price: 180, stock: 24 },
+    { id: 2, name: "PE Kit", category: "Uniform", price: 90, stock: 40 },
+    { id: 3, name: "Mathematics Textbook", category: "Books", price: 45, stock: 15 },
+    { id: 4, name: "Integrated Science Textbook", category: "Books", price: 48, stock: 12 },
+    { id: 5, name: "Exercise Books (Pack of 10)", category: "Stationery", price: 20, stock: 60 },
+    { id: 6, name: "Geometry Set", category: "Stationery", price: 15, stock: 33 },
+  ],
+  studentOrders: [],
 };
+
+// Persist teacher-recorded data (marks, attendance) across page loads/reloads.
+// This is a client-only prototype, so localStorage stands in for the backend DB.
+(function loadPersistedRecords(){
+  try {
+    const saved = JSON.parse(localStorage.getItem("sms_records"));
+    if (saved) {
+      if (saved.assessments) DB.assessments = saved.assessments;
+      if (saved.attendanceToday) DB.attendanceToday = saved.attendanceToday;
+      if (saved.results) DB.results = saved.results;
+      if (saved.students) DB.students = saved.students;
+      if (saved.fees) DB.fees = saved.fees;
+      if (saved.reports) DB.reports = saved.reports;
+      if (saved.storeItems) DB.storeItems = saved.storeItems;
+      if (saved.studentOrders) DB.studentOrders = saved.studentOrders;
+    }
+  } catch(e){}
+})();
+
+function persistRecords(){
+  localStorage.setItem("sms_records", JSON.stringify({
+    assessments: DB.assessments,
+    attendanceToday: DB.attendanceToday,
+    results: DB.results,
+    students: DB.students,
+    fees: DB.fees,
+    reports: DB.reports,
+    storeItems: DB.storeItems,
+    studentOrders: DB.studentOrders,
+  }));
+}
+
+// Adds a school fees document (invoice/statement) uploaded by an admin as a file,
+// stored as a data URL so it can be re-downloaded by parents from localStorage.
+function addFeeDocument({ title, class: className, term, fileName, fileData }){
+  const doc = {
+    id: DB.fees.length ? Math.max(...DB.fees.map(f=>f.id)) + 1 : 1,
+    title, class: className, term, fileName, fileData,
+    uploadedAt: new Date().toISOString().slice(0,10),
+  };
+  DB.fees.push(doc);
+  persistRecords();
+  return doc;
+}
+
+function feesForClass(className){
+  return DB.fees.filter(f => f.class === "All Classes" || f.class === className);
+}
+
+// Adds a student report (report card / progress report) uploaded by an admin as a
+// file for a specific student, stored as a data URL for parents to download.
+function addReportDocument({ title, student, term, fileName, fileData }){
+  const doc = {
+    id: DB.reports.length ? Math.max(...DB.reports.map(r=>r.id)) + 1 : 1,
+    title, student, term, fileName, fileData,
+    uploadedAt: new Date().toISOString().slice(0,10),
+  };
+  DB.reports.push(doc);
+  persistRecords();
+  return doc;
+}
+
+function reportsForStudent(studentName){
+  return DB.reports.filter(r => r.student === studentName);
+}
+
+// Places a school-store order for a student: validates stock, decrements it,
+// and records the order for the student's order history.
+function placeStoreOrder(studentName, cart){
+  const items = cart.map(({ id, qty }) => {
+    const item = DB.storeItems.find(i => i.id === id);
+    return { id, name: item.name, price: item.price, qty };
+  });
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  cart.forEach(({ id, qty }) => {
+    const item = DB.storeItems.find(i => i.id === id);
+    if (item) item.stock = Math.max(0, item.stock - qty);
+  });
+  const order = {
+    id: DB.studentOrders.length ? Math.max(...DB.studentOrders.map(o=>o.id)) + 1 : 1,
+    student: studentName, items, total, status: "Pending Pickup",
+    date: new Date().toISOString().slice(0,10),
+  };
+  DB.studentOrders.push(order);
+  persistRecords();
+  return order;
+}
+
+function ordersForStudent(studentName){
+  return DB.studentOrders.filter(o => o.student === studentName);
+}
+
+// Adds a student to the shared DB and persists it, so it survives reloads
+// and shows up for admins as well as the teacher who added it.
+function addStudent({ name, admission, class: className, parent, gender }){
+  const student = {
+    id: DB.students.length ? Math.max(...DB.students.map(s=>s.id)) + 1 : 1,
+    name, admission, class: className, parent, gender,
+    attendance: 100, avg: 0, status: "Active",
+  };
+  DB.students.push(student);
+  persistRecords();
+  return student;
+}
 
 function initials(name){
   return name.split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase();

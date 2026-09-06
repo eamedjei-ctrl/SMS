@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · School Fees</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>Upload Fee Statement</h2></div>
+        <div class="field"><label>Title</label><input id="f-title" placeholder="e.g. Term 1 Fee Invoice"></div>
+        <div class="two-col">
+          <div class="field"><label>Class</label><select id="f-class"></select></div>
+          <div class="field"><label>Term</label><input id="f-term" placeholder="e.g. Term 1"></div>
+        </div>
+        <div class="field"><label>File</label><input type="file" id="f-file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx"></div>
+        <div class="empty" id="f-msg" style="display:none;"></div>
+        <button class="btn" id="upload-fee">Upload Statement</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Uploaded Fee Statements</h2></div>
+        <table>
+          <thead><tr><th>Title</th><th>Class</th><th>Term</th><th>File</th><th>Uploaded</th><th></th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"admin", active:"admin-fees.html", title:"School Fees", sub:"Upload fee statements for parents to view and download" });
+
+  const classOptions = DB.classes.map(c=>`<option>${c.name}</option>`).join("");
+  document.getElementById("f-class").innerHTML = `<option>All Classes</option>` + classOptions;
+
+  function render(){
+    document.getElementById("body").innerHTML = DB.fees.length ? DB.fees.slice().reverse().map(f=>`
+      <tr>
+        <td><strong>${f.title}</strong></td>
+        <td>${f.class}</td>
+        <td>${f.term}</td>
+        <td>${f.fileName}</td>
+        <td>${f.uploadedAt}</td>
+        <td><a class="btn ghost small" href="${f.fileData}" download="${f.fileName}">Download</a></td>
+      </tr>`).join("") : `<tr><td colspan="6" class="empty">No fee statements uploaded yet</td></tr>`;
+  }
+  render();
+
+  const msg = document.getElementById("f-msg");
+  document.getElementById("upload-fee").addEventListener("click", () => {
+    const title = document.getElementById("f-title").value.trim();
+    const className = document.getElementById("f-class").value;
+    const term = document.getElementById("f-term").value.trim();
+    const fileInput = document.getElementById("f-file");
+    const file = fileInput.files[0];
+
+    if (!title || !term || !file) {
+      msg.textContent = "Please provide a title, term, and file to upload.";
+      msg.style.display = "block";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      addFeeDocument({ title, class: className, term, fileName: file.name, fileData: reader.result });
+      document.getElementById("f-title").value = "";
+      document.getElementById("f-term").value = "";
+      fileInput.value = "";
+      msg.style.display = "none";
+      render();
+    };
+    reader.onerror = () => {
+      msg.textContent = "Could not read the selected file. Please try again.";
+      msg.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  });
+</script>
+</body>
+</html>

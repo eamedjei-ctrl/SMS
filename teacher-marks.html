@@ -26,7 +26,7 @@
           <thead><tr><th>Name</th><th>Admission No.</th><th>Class</th><th>Score (/100)</th></tr></thead>
           <tbody id="body"></tbody>
         </table>
-        <button class="btn" style="margin-top:14px;" onclick="alert('Marks submitted (demo only)')">Submit Marks</button>
+        <button class="btn" style="margin-top:14px;" id="submit-marks-btn">Submit Marks</button>
       </div>
       <div class="panel">
         <div class="panel-head"><h2>Recent Entries</h2></div>
@@ -52,19 +52,46 @@
       <td class="row-flex"><span class="avatar">${initials(s.name)}</span> <strong>${s.name}</strong></td>
       <td>${s.admission}</td>
       <td>${s.class}</td>
-      <td><input type="number" min="0" max="100" placeholder="--" style="width:80px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;"></td>
+      <td><input type="number" min="0" max="100" placeholder="--" data-student="${s.name}" style="width:80px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;"></td>
     </tr>`).join("") : `<tr><td colspan="4" class="empty">No students assigned to your classes</td></tr>`;
 
   const myStudentNames = myStudents.map(s=>s.name);
-  const myRecentEntries = DB.assessments.filter(a=>myStudentNames.includes(a.student));
-  document.getElementById("recent-body").innerHTML = myRecentEntries.length ? myRecentEntries.map(a=>`
-    <tr>
-      <td>${a.student}</td>
-      <td>${a.subject}</td>
-      <td>${a.type}</td>
-      <td>${a.score}/${a.max}</td>
-      <td>${a.term}</td>
-    </tr>`).join("") : `<tr><td colspan="5" class="empty">No recent entries for your students</td></tr>`;
+
+  function renderRecent(){
+    const myRecentEntries = DB.assessments.filter(a=>myStudentNames.includes(a.student));
+    document.getElementById("recent-body").innerHTML = myRecentEntries.length ? myRecentEntries.slice().reverse().map(a=>`
+      <tr>
+        <td>${a.student}</td>
+        <td>${a.subject}</td>
+        <td>${a.type}</td>
+        <td>${a.score}/${a.max}</td>
+        <td>${a.term}</td>
+      </tr>`).join("") : `<tr><td colspan="5" class="empty">No recent entries for your students</td></tr>`;
+  }
+  renderRecent();
+
+  document.getElementById("submit-marks-btn").addEventListener("click", () => {
+    const subject = document.getElementById("subject-select").value;
+    const type = document.querySelector('input[placeholder^="Assessment type"]').value.trim() || "Assessment";
+    const termSelect = document.querySelectorAll(".toolbar select")[1];
+    const inputs = document.querySelectorAll('#body input[data-student]');
+    let count = 0;
+    inputs.forEach(input => {
+      const score = parseFloat(input.value);
+      if (!isNaN(score)) {
+        DB.assessments.push({ student: input.dataset.student, subject, type, score, max: 100, term: termSelect.value });
+        input.value = "";
+        count++;
+      }
+    });
+    if (count === 0) {
+      alert("Enter at least one score before submitting.");
+      return;
+    }
+    persistRecords();
+    renderRecent();
+    alert(`${count} mark${count>1?"s":""} submitted.`);
+  });
 </script>
 </body>
 </html>

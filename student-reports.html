@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student · Report Cards</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>Report Cards</h2></div>
+        <div id="reports-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const me = DB.students[0];
+  renderShell({ role:"student", active:"student-reports.html", title:"Report Cards", sub:"Report cards uploaded by the school" });
+
+  const myReports = reportsForStudent(me.name);
+  document.getElementById("reports-list").innerHTML = myReports.length ? myReports.slice().reverse().map(r=>`
+    <div class="list-item">
+      <div>
+        <div class="title">${r.title}</div>
+        <div class="meta">${r.term} · Uploaded ${r.uploadedAt}</div>
+      </div>
+      <a class="btn small" href="${r.fileData}" download="${r.fileName}">Download</a>
+    </div>`).join("") : `<div class="empty">No report cards have been uploaded yet</div>`;
+</script>
+</body>
+</html>

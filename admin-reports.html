@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Student Reports</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="panel">
+        <div class="panel-head"><h2>Upload Student Report</h2></div>
+        <div class="field"><label>Title</label><input id="r-title" placeholder="e.g. Term 1 Report Card"></div>
+        <div class="two-col">
+          <div class="field"><label>Student</label><select id="r-student"></select></div>
+          <div class="field"><label>Term</label><input id="r-term" placeholder="e.g. Term 1"></div>
+        </div>
+        <div class="field"><label>File</label><input type="file" id="r-file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"></div>
+        <div class="empty" id="r-msg" style="display:none;"></div>
+        <button class="btn" id="upload-report">Upload Report</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Uploaded Reports</h2></div>
+        <table>
+          <thead><tr><th>Title</th><th>Student</th><th>Term</th><th>File</th><th>Uploaded</th><th></th></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  renderShell({ role:"admin", active:"admin-reports.html", title:"Student Reports", sub:"Upload report cards for parents to view and download" });
+
+  document.getElementById("r-student").innerHTML = DB.students.map(s=>`<option>${s.name}</option>`).join("");
+
+  function render(){
+    document.getElementById("body").innerHTML = DB.reports.length ? DB.reports.slice().reverse().map(r=>`
+      <tr>
+        <td><strong>${r.title}</strong></td>
+        <td>${r.student}</td>
+        <td>${r.term}</td>
+        <td>${r.fileName}</td>
+        <td>${r.uploadedAt}</td>
+        <td><a class="btn ghost small" href="${r.fileData}" download="${r.fileName}">Download</a></td>
+      </tr>`).join("") : `<tr><td colspan="6" class="empty">No student reports uploaded yet</td></tr>`;
+  }
+  render();
+
+  const msg = document.getElementById("r-msg");
+  document.getElementById("upload-report").addEventListener("click", () => {
+    const title = document.getElementById("r-title").value.trim();
+    const student = document.getElementById("r-student").value;
+    const term = document.getElementById("r-term").value.trim();
+    const fileInput = document.getElementById("r-file");
+    const file = fileInput.files[0];
+
+    if (!title || !term || !file) {
+      msg.textContent = "Please provide a title, term, and file to upload.";
+      msg.style.display = "block";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      addReportDocument({ title, student, term, fileName: file.name, fileData: reader.result });
+      document.getElementById("r-title").value = "";
+      document.getElementById("r-term").value = "";
+      fileInput.value = "";
+      msg.style.display = "none";
+      render();
+    };
+    reader.onerror = () => {
+      msg.textContent = "Could not read the selected file. Please try again.";
+      msg.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  });
+</script>
+</body>
+</html>

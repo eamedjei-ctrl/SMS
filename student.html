@@ -28,6 +28,14 @@
           <div id="notices-list"></div>
         </div>
       </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Quick Links</h2></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
+          <a href="student-fees.html" class="list-item" style="text-decoration:none;color:inherit;"><div><div class="title">💳 School Fees</div><div class="meta" id="fees-hint">Statements from the school</div></div></a>
+          <a href="student-reports.html" class="list-item" style="text-decoration:none;color:inherit;"><div><div class="title">📄 Report Cards</div><div class="meta" id="reports-hint">Term report cards</div></div></a>
+          <a href="student-store.html" class="list-item" style="text-decoration:none;color:inherit;"><div><div class="title">🛒 School Store</div><div class="meta" id="orders-hint">Order uniforms & supplies</div></div></a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -63,6 +71,13 @@
       <div><div class="title">${n.title}</div><div class="meta">${n.date}</div></div>
       <span class="badge blue">${n.role}</span>
     </div>`).join("");
+
+  const myFees = feesForClass(me.class);
+  document.getElementById("fees-hint").textContent = myFees.length ? `${myFees.length} statement${myFees.length===1?"":"s"} available` : "No statements yet";
+  const myReports = reportsForStudent(me.name);
+  document.getElementById("reports-hint").textContent = myReports.length ? `${myReports.length} report${myReports.length===1?"":"s"} available` : "No reports yet";
+  const myOrders = ordersForStudent(me.name);
+  document.getElementById("orders-hint").textContent = myOrders.length ? `${myOrders.length} order${myOrders.length===1?"":"s"} placed` : "Order uniforms & supplies";
 </script>
 </body>
 </html>

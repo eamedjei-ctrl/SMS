@@ -14,6 +14,8 @@ const NAV = {
     { href:"admin-teachers.html", icon:"🧑‍🏫", label:"Teachers" },
     { href:"admin-classes.html", icon:"🏷", label:"Classes & Subjects" },
     { href:"admin-results.html", icon:"📊", label:"Results" },
+    { href:"admin-fees.html", icon:"💳", label:"School Fees" },
+    { href:"admin-reports.html", icon:"📄", label:"Student Reports" },
     { href:"admin-notices.html", icon:"📣", label:"Notices" },
   ],
   teacher: [
@@ -28,12 +30,19 @@ const NAV = {
     { href:"student-results.html", icon:"📊", label:"Results" },
     { href:"student-timetable.html", icon:"🗓", label:"Timetable" },
     { href:"student-assignments.html", icon:"📚", label:"Assignments" },
+    { href:"student-fees.html", icon:"💳", label:"School Fees" },
+    { href:"student-reports.html", icon:"📄", label:"Report Cards" },
+    { href:"student-store.html", icon:"🛒", label:"School Store" },
     { href:"student-notices.html", icon:"📣", label:"Notices" },
   ],
   parent: [
     { href:"parent.html", icon:"◆", label:"Overview" },
     { href:"parent-results.html", icon:"📊", label:"Ward Results" },
     { href:"parent-attendance.html", icon:"🗓", label:"Ward Attendance" },
+    { href:"parent-timetable.html", icon:"🕘", label:"Ward Timetable" },
+    { href:"parent-assignments.html", icon:"📚", label:"Ward Assignments" },
+    { href:"parent-fees.html", icon:"💳", label:"School Fees" },
+    { href:"parent-reports.html", icon:"📄", label:"Student Reports" },
     { href:"parent-notices.html", icon:"📣", label:"Notices & Messages" },
   ],
 };

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher · Student Record</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="row-flex"><button class="menu-btn" id="menu-btn">☰</button>
+        <div><h1 id="topbar-title"></h1><div class="sub" id="topbar-sub"></div></div>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  const session = renderShell({ role:"teacher", active:"teacher-students.html", title:"Student Record", sub:"" });
+
+  const params = new URLSearchParams(window.location.search);
+  const studentId = parseInt(params.get("id"), 10);
+  const myStudents = studentsForTeacher(session.name);
+  const student = myStudents.find(s => s.id === studentId);
+
+  if (!student) {
+    document.getElementById("content").innerHTML = `<div class="panel"><div class="empty">Student not found, or not assigned to your classes.</div></div>`;
+  } else {
+    document.getElementById("topbar-sub").textContent = `${student.class} · Admission No. ${student.admission}`;
+
+    document.getElementById("content").innerHTML = `
+      <div class="panel" id="profile-card"></div>
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head"><h2>Today's Attendance</h2></div>
+          <div id="attendance-box"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Term Results</h2></div>
+          <table><thead><tr><th>Term</th><th>Average</th><th>Position</th><th>Grade</th><th>Status</th></tr></thead>
+          <tbody id="results-body"></tbody></table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Assessment Scores</h2></div>
+        <table><thead><tr><th>Subject</th><th>Type</th><th>Score</th><th>Term</th></tr></thead>
+        <tbody id="assessments-body"></tbody></table>
+        <div class="toolbar" style="margin-top:14px;">
+          <select id="subject-select"></select>
+          <input id="type-input" placeholder="Assessment type (e.g. CA Test 1)" style="flex:1;">
+          <input id="score-input" type="number" min="0" max="100" placeholder="Score /100" style="max-width:120px;">
+          <select id="term-select"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+          <button class="btn" id="add-score-btn">Add Score</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("profile-card").innerHTML = `
+      <div class="row-flex" style="gap:16px;justify-content:space-between;">
+        <div class="row-flex" style="gap:16px;">
+          <span class="avatar" style="width:52px;height:52px;font-size:18px;">${initials(student.name)}</span>
+          <div>
+            <div class="title" style="font-size:17px;">${student.name}</div>
+            <div class="meta">${student.class} · Parent: ${student.parent}</div>
+          </div>
+        </div>
+        <span class="badge ${badgeFor(student.status)}">${student.status}</span>
+      </div>
+    `;
+
+    const statuses = ["Present","Absent","Late"];
+    function renderAttendance(){
+      const existing = DB.attendanceToday.find(a=>a.student===student.name);
+      const current = existing ? existing.status : "Present";
+      document.getElementById("attendance-box").innerHTML = `
+        <div class="row-flex" style="gap:6px;">
+          ${statuses.map(st=>`<button type="button" class="btn ${st===current?'':'ghost'} small" data-status="${st}" id="att-${st}">${st}</button>`).join("")}
+        </div>
+      `;
+      statuses.forEach(st => {
+        document.getElementById(`att-${st}`).addEventListener("click", () => {
+          const i = DB.attendanceToday.findIndex(a=>a.student===student.name);
+          if (i >= 0) DB.attendanceToday[i].status = st;
+          else DB.attendanceToday.push({ student: student.name, status: st });
+          persistRecords();
+          renderAttendance();
+        });
+      });
+    }
+    renderAttendance();
+
+    function renderResults(){
+      const myResults = DB.results.filter(r=>r.student===student.name);
+      document.getElementById("results-body").innerHTML = myResults.length ? myResults.map(r=>`
+        <tr>
+          <td>${r.term}</td>
+          <td>${r.average}</td>
+          <td>${r.position}</td>
+          <td>${r.grade}</td>
+          <td><span class="badge ${badgeFor(r.status)}">${r.status}</span></td>
+        </tr>`).join("") : `<tr><td colspan="5" class="empty">No results recorded yet</td></tr>`;
+    }
+    renderResults();
+
+    document.getElementById("subject-select").innerHTML = DB.subjects.map(s=>`<option>${s}</option>`).join("");
+
+    function renderAssessments(){
+      const myAssessments = DB.assessments.filter(a=>a.student===student.name);
+      document.getElementById("assessments-body").innerHTML = myAssessments.length ? myAssessments.slice().reverse().map(a=>`
+        <tr>
+          <td>${a.subject}</td>
+          <td>${a.type}</td>
+          <td>${a.score}/${a.max}</td>
+          <td>${a.term}</td>
+        </tr>`).join("") : `<tr><td colspan="4" class="empty">No assessment scores recorded yet</td></tr>`;
+    }
+    renderAssessments();
+
+    document.getElementById("add-score-btn").addEventListener("click", () => {
+      const subject = document.getElementById("subject-select").value;
+      const type = document.getElementById("type-input").value.trim() || "Assessment";
+      const term = document.getElementById("term-select").value;
+      const score = parseFloat(document.getElementById("score-input").value);
+      if (isNaN(score) || score < 0 || score > 100) {
+        alert("Enter a valid score between 0 and 100.");
+        return;
+      }
+      DB.assessments.push({ student: student.name, subject, type, score, max: 100, term });
+      persistRecords();
+      document.getElementById("type-input").value = "";
+      document.getElementById("score-input").value = "";
+      renderAssessments();
+    });
+  }
+</script>
+</body>
+</html>
