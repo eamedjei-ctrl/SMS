@@ -33,6 +33,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const session = renderShell({ role:"teacher", active:"teacher-attendance.html", title:"Attendance", sub:"Mark daily attendance for your class" });
 
   const myClasses = classesForTeacher(session.name);
@@ -62,19 +63,20 @@
     row.querySelectorAll("button").forEach(b=>{ b.classList.add("ghost"); });
     btn.classList.remove("ghost");
   }
+  window.selectStatus = selectStatus;
 
-  document.getElementById("save-attendance-btn").addEventListener("click", () => {
+  document.getElementById("save-attendance-btn").addEventListener("click", async () => {
+    const entries = [];
     document.querySelectorAll("#body tr[data-student]").forEach(row => {
       const student = row.dataset.student;
       const activeBtn = row.querySelector("button:not(.ghost)");
       const status = activeBtn ? activeBtn.dataset.status : "Present";
-      const i = DB.attendanceToday.findIndex(a=>a.student===student);
-      if (i >= 0) DB.attendanceToday[i].status = status;
-      else DB.attendanceToday.push({ student, status });
+      entries.push({ student, status });
     });
-    persistRecords();
-    alert("Attendance saved.");
+    try { await saveAttendance(entries); alert("Attendance saved."); }
+    catch (error) { alert(error.message); }
   });
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

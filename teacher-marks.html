@@ -41,6 +41,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const session = renderShell({ role:"teacher", active:"teacher-marks.html", title:"Marks Entry", sub:"Record assessment scores for your students" });
 
   const myStudents = studentsForTeacher(session.name);
@@ -70,16 +71,17 @@
   }
   renderRecent();
 
-  document.getElementById("submit-marks-btn").addEventListener("click", () => {
+  document.getElementById("submit-marks-btn").addEventListener("click", async () => {
     const subject = document.getElementById("subject-select").value;
     const type = document.querySelector('input[placeholder^="Assessment type"]').value.trim() || "Assessment";
     const termSelect = document.querySelectorAll(".toolbar select")[1];
     const inputs = document.querySelectorAll('#body input[data-student]');
     let count = 0;
+    const pending = [];
     inputs.forEach(input => {
       const score = parseFloat(input.value);
       if (!isNaN(score)) {
-        DB.assessments.push({ student: input.dataset.student, subject, type, score, max: 100, term: termSelect.value });
+        pending.push({ student: input.dataset.student, subject, type, score, max: 100, term: termSelect.value });
         input.value = "";
         count++;
       }
@@ -88,10 +90,12 @@
       alert("Enter at least one score before submitting.");
       return;
     }
-    persistRecords();
+    try { await Promise.all(pending.map(addAssessment)); }
+    catch (error) { alert(error.message); return; }
     renderRecent();
     alert(`${count} mark${count>1?"s":""} submitted.`);
   });
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

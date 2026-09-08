@@ -32,6 +32,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const session = renderShell({ role:"teacher", active:"teacher.html", title:"Teacher Overview", sub:"Daniel Mensah · Mathematics Department" });
 
   const myClasses = classesForTeacher(session.name);
@@ -58,6 +59,7 @@
       <div><div class="title">${a.title}</div><div class="meta">${a.subject} · Due ${a.due}</div></div>
       <span class="badge ${badgeFor(a.status)}">${a.status}</span>
     </div>`).join("");
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

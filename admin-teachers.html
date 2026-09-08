@@ -42,6 +42,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin-teachers.html", title:"Teachers", sub:"Manage teaching staff at Greenfield High School" });
 
   document.getElementById("body").innerHTML = DB.teachers.map(t=>`

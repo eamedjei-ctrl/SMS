@@ -45,6 +45,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin-students.html", title:"Students", sub:"All enrolled students at Greenfield High School" });
 
   const classOptions = DB.classes.map(c=>`<option>${c.name}</option>`).join("");

@@ -30,6 +30,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"parent", active:"parent-notices.html", title:"Notices & Messages", sub:"Announcements and communication with the school" });
 
   const myNotices = DB.notices.filter(n=>n.role==="All"||n.role==="Parent");
@@ -44,6 +45,8 @@
     const t = document.getElementById("msg");
     if (t.value.trim()){ alert("Message sent (demo only)"); t.value = ""; }
   }
+  window.sendMsg = sendMsg;
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

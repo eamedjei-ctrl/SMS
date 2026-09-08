@@ -37,6 +37,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin.html", title:"School Overview", sub:"Greenfield High School · Term 1, 2026/2027" });
 
   const pending = DB.results.filter(r=>r.status==="Pending Approval");
@@ -70,6 +71,7 @@
     <div class="list-item">
       <div><div class="title">${l.action}</div><div class="meta">${l.user} · ${l.time}</div></div>
     </div>`).join("") : `<div class="empty">No teacher or student updates yet</div>`;
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

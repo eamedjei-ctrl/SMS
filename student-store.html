@@ -44,6 +44,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const me = DB.students[0];
   renderShell({ role:"student", active:"student-store.html", title:"School Store", sub:"Order uniforms, books and stationery" });
 
@@ -104,10 +105,11 @@
 
   document.getElementById("category-filter").addEventListener("change", (e) => renderItems(e.target.value));
 
-  document.getElementById("place-order").addEventListener("click", () => {
+  document.getElementById("place-order").addEventListener("click", async () => {
     const cartArr = Object.entries(cart).map(([id, qty]) => ({ id: Number(id), qty }));
     if (!cartArr.length) return;
-    placeStoreOrder(me.name, cartArr);
+    try { await placeStoreOrder(me.name, cartArr); }
+    catch (error) { alert(error.message); return; }
     Object.keys(cart).forEach(k => delete cart[k]);
     document.getElementById("order-msg").textContent = "Order placed! Collect your items from the school store.";
     document.getElementById("order-msg").style.display = "block";
@@ -119,6 +121,7 @@
   renderItems();
   renderCart();
   renderOrders();
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

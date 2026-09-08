@@ -42,6 +42,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"parent", active:"parent.html", title:"Parent Overview", sub:"Tracking Kojo Mensah's progress" });
 
   const ward = DB.students[0];
@@ -80,6 +81,7 @@
   document.getElementById("fees-hint").textContent = myFees.length ? `${myFees.length} statement${myFees.length===1?"":"s"} available` : "No statements yet";
   const myReports = reportsForStudent(ward.name);
   document.getElementById("reports-hint").textContent = myReports.length ? `${myReports.length} report${myReports.length===1?"":"s"} available` : "No reports yet";
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

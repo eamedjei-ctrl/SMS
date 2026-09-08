@@ -25,6 +25,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const me = DB.students[0];
   renderShell({ role:"student", active:"student-reports.html", title:"Report Cards", sub:"Report cards uploaded by the school" });
 
@@ -37,6 +38,7 @@
       </div>
       <a class="btn small" href="${r.fileData}" download="${r.fileName}">Download</a>
     </div>`).join("") : `<div class="empty">No report cards have been uploaded yet</div>`;
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

@@ -34,6 +34,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"superadmin", active:"superadmin-logs.html", title:"Audit Logs", sub:"Full activity trail across the platform" });
 
   document.getElementById("body").innerHTML = DB.auditLogs.map(l=>`
@@ -43,6 +44,7 @@
       <td>${l.time}</td>
       <td>${l.ip}</td>
     </tr>`).join("") || `<tr><td colspan="4" class="empty">No log entries</td></tr>`;
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

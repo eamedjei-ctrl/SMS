@@ -33,6 +33,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"parent", active:"parent-results.html", title:"Ward Results", sub:"Kojo Mensah · JHS 1A" });
 
   const ward = DB.students[0];
@@ -60,6 +61,7 @@
       </div>
       <div class="progress"><span style="width:${(a.score/a.max*100).toFixed(0)}%"></span></div>
     </div>`).join("") : `<div class="empty">No assessment scores recorded yet</div>`;
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

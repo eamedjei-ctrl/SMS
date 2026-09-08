@@ -1,6 +1,4 @@
-// Mock data layer for the School Management System UI prototype.
-// In a real system this would be replaced by API calls to the backend described
-// in the specification (Node/Python API + PostgreSQL/MySQL).
+// Shared client data layer backed by the Flask API.
 
 const DB = {
   schools: [
@@ -9,9 +7,19 @@ const DB = {
     { id: 3, name: "Northgate College", address: "4 Hilltop Ave, Tamale", status: "Suspended", staff: 20, students: 190 },
   ],
   admins: [
-    { id: 1, name: "Grace Owusu", email: "g.owusu@greenfield.edu", school: "Greenfield High School", status: "Active" },
-    { id: 2, name: "Kwame Asare", email: "k.asare@riverside.edu", school: "Riverside Academy", status: "Active" },
-    { id: 3, name: "Linda Boateng", email: "l.boateng@northgate.edu", school: "Northgate College", status: "Suspended" },
+    { id: 1, name: "Grace Owusu", email: "g.owusu@greenfield.edu", school: "Greenfield High School", status: "Active", password: "password123", role: "admin" },
+    { id: 2, name: "Kwame Asare", email: "k.asare@riverside.edu", school: "Riverside Academy", status: "Active", password: "password123", role: "admin" },
+    { id: 3, name: "Linda Boateng", email: "l.boateng@northgate.edu", school: "Northgate College", status: "Suspended", password: "password123", role: "admin" },
+  ],
+  // Temporary development accounts used by the Flask authentication route.
+  authUsers: [
+    { name: "Efua Amedjei", email: "superadmin@sasuschools.com", role: "superadmin", password: "password123" },
+    { name: "Grace Owusu", email: "g.owusu@greenfield.edu", role: "admin", password: "password123" },
+    { name: "Kwame Asare", email: "k.asare@riverside.edu", role: "admin", password: "password123" },
+    { name: "Linda Boateng", email: "l.boateng@northgate.edu", role: "admin", password: "password123" },
+    { name: "Daniel Mensah", email: "teacher@greenfield.edu", role: "teacher", password: "password123" },
+    { name: "Kojo Mensah", email: "student@greenfield.edu", role: "student", password: "password123" },
+    { name: "Yaw Mensah", email: "parent@greenfield.edu", role: "parent", password: "password123" },
   ],
   classes: [
     { id: 1, name: "JHS 1A", teacher: "Mr. Daniel Mensah", students: 32, subject: "Homeroom" },
@@ -87,47 +95,28 @@ const DB = {
   studentOrders: [],
 };
 
-// Persist teacher-recorded data (marks, attendance) across page loads/reloads.
-// This is a client-only prototype, so localStorage stands in for the backend DB.
-(function loadPersistedRecords(){
-  try {
-    const saved = JSON.parse(localStorage.getItem("sms_records"));
-    if (saved) {
-      if (saved.assessments) DB.assessments = saved.assessments;
-      if (saved.attendanceToday) DB.attendanceToday = saved.attendanceToday;
-      if (saved.results) DB.results = saved.results;
-      if (saved.students) DB.students = saved.students;
-      if (saved.fees) DB.fees = saved.fees;
-      if (saved.reports) DB.reports = saved.reports;
-      if (saved.storeItems) DB.storeItems = saved.storeItems;
-      if (saved.studentOrders) DB.studentOrders = saved.studentOrders;
-    }
-  } catch(e){}
-})();
+const API_READY = fetch(`${window.SMS_API_BASE || "http://127.0.0.1:5000/api"}/state`)
+  .then(response => {
+    if (!response.ok) throw new Error("Could not load data from the Flask API.");
+    return response.json();
+  })
+  .then(state => Object.assign(DB, state));
 
-function persistRecords(){
-  localStorage.setItem("sms_records", JSON.stringify({
-    assessments: DB.assessments,
-    attendanceToday: DB.attendanceToday,
-    results: DB.results,
-    students: DB.students,
-    fees: DB.fees,
-    reports: DB.reports,
-    storeItems: DB.storeItems,
-    studentOrders: DB.studentOrders,
-  }));
+async function apiRequest(path, options = {}){
+  const response = await fetch(`${window.SMS_API_BASE || "http://127.0.0.1:5000/api"}${path}`, {
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error || "The API request failed.");
+  return body;
 }
 
 // Adds a school fees document (invoice/statement) uploaded by an admin as a file,
-// stored as a data URL so it can be re-downloaded by parents from localStorage.
-function addFeeDocument({ title, class: className, term, fileName, fileData }){
-  const doc = {
-    id: DB.fees.length ? Math.max(...DB.fees.map(f=>f.id)) + 1 : 1,
-    title, class: className, term, fileName, fileData,
-    uploadedAt: new Date().toISOString().slice(0,10),
-  };
+// stored as a data URL so it can be re-downloaded by parents.
+async function addFeeDocument(document){
+  const doc = await apiRequest("/fees", { method: "POST", body: JSON.stringify(document) });
   DB.fees.push(doc);
-  persistRecords();
   return doc;
 }
 
@@ -137,14 +126,9 @@ function feesForClass(className){
 
 // Adds a student report (report card / progress report) uploaded by an admin as a
 // file for a specific student, stored as a data URL for parents to download.
-function addReportDocument({ title, student, term, fileName, fileData }){
-  const doc = {
-    id: DB.reports.length ? Math.max(...DB.reports.map(r=>r.id)) + 1 : 1,
-    title, student, term, fileName, fileData,
-    uploadedAt: new Date().toISOString().slice(0,10),
-  };
+async function addReportDocument(document){
+  const doc = await apiRequest("/reports", { method: "POST", body: JSON.stringify(document) });
   DB.reports.push(doc);
-  persistRecords();
   return doc;
 }
 
@@ -154,23 +138,13 @@ function reportsForStudent(studentName){
 
 // Places a school-store order for a student: validates stock, decrements it,
 // and records the order for the student's order history.
-function placeStoreOrder(studentName, cart){
-  const items = cart.map(({ id, qty }) => {
-    const item = DB.storeItems.find(i => i.id === id);
-    return { id, name: item.name, price: item.price, qty };
+async function placeStoreOrder(studentName, cart){
+  const order = await apiRequest("/orders", { method: "POST", body: JSON.stringify({ student: studentName, cart }) });
+  const orderedIds = new Set(order.items.map(item => item.id));
+  DB.storeItems.forEach(item => {
+    if (orderedIds.has(item.id)) item.stock -= order.items.find(entry => entry.id === item.id).qty;
   });
-  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-  cart.forEach(({ id, qty }) => {
-    const item = DB.storeItems.find(i => i.id === id);
-    if (item) item.stock = Math.max(0, item.stock - qty);
-  });
-  const order = {
-    id: DB.studentOrders.length ? Math.max(...DB.studentOrders.map(o=>o.id)) + 1 : 1,
-    student: studentName, items, total, status: "Pending Pickup",
-    date: new Date().toISOString().slice(0,10),
-  };
   DB.studentOrders.push(order);
-  persistRecords();
   return order;
 }
 
@@ -180,15 +154,33 @@ function ordersForStudent(studentName){
 
 // Adds a student to the shared DB and persists it, so it survives reloads
 // and shows up for admins as well as the teacher who added it.
-function addStudent({ name, admission, class: className, parent, gender }){
-  const student = {
-    id: DB.students.length ? Math.max(...DB.students.map(s=>s.id)) + 1 : 1,
-    name, admission, class: className, parent, gender,
-    attendance: 100, avg: 0, status: "Active",
-  };
+async function addStudent(studentData){
+  const student = await apiRequest("/students", { method: "POST", body: JSON.stringify(studentData) });
   DB.students.push(student);
-  persistRecords();
   return student;
+}
+
+async function saveAttendance(entries){
+  const saved = await apiRequest("/attendance", { method: "POST", body: JSON.stringify(entries) });
+  DB.attendanceToday = saved;
+  return saved;
+}
+
+async function addAssessment(assessment){
+  const saved = await apiRequest("/assessments", { method: "POST", body: JSON.stringify(assessment) });
+  DB.assessments.push(saved);
+  return saved;
+}
+
+async function addNotice(notice){
+  const saved = await apiRequest("/notices", { method: "POST", body: JSON.stringify(notice) });
+  DB.notices.push(saved);
+  return saved;
+}
+
+async function addSubject(subject){
+  DB.subjects = await apiRequest("/subjects", { method: "POST", body: JSON.stringify({ subject }) });
+  return DB.subjects;
 }
 
 function initials(name){

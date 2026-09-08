@@ -55,6 +55,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"superadmin", active:"superadmin-users.html", title:"Admins & Users", sub:"Manage school administrator accounts" });
 
   document.getElementById("school-select").innerHTML = DB.schools.map(s=>`<option>${s.name}</option>`).join("");

@@ -34,6 +34,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin-results.html", title:"Results", sub:"Review and approve student results before publishing" });
 
   function renderRows(){
@@ -49,12 +50,26 @@
         <td>${r.status==="Pending Approval" ? `<button class="btn small" onclick="approve(${i})">Approve</button>` : ""}</td>
       </tr>`).join("");
   }
-  function approve(i){ DB.results[i].status = "Approved"; renderRows(); }
-  function publishAll(){
-    DB.results.forEach(r=>{ if (r.status==="Approved") r.status = "Published"; });
-    renderRows();
+  async function approve(i){
+    try {
+      DB.results[i] = await apiRequest(`/results/${i}`, { method:"PATCH", body:JSON.stringify({ status:"Approved" }) });
+      renderRows();
+    } catch (error) { alert(error.message); }
   }
+  async function publishAll(){
+    try {
+      await Promise.all(DB.results.map(async (result, index) => {
+        if (result.status === "Approved") {
+          DB.results[index] = await apiRequest(`/results/${index}`, { method:"PATCH", body:JSON.stringify({ status:"Published" }) });
+        }
+      }));
+      renderRows();
+    } catch (error) { alert(error.message); }
+  }
+  window.approve = approve;
+  window.publishAll = publishAll;
   renderRows();
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

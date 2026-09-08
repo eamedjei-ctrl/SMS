@@ -38,6 +38,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"teacher", active:"teacher-assignments.html", title:"Assignments", sub:"Manage assignments for your classes" });
 
   document.getElementById("subject-select").innerHTML = DB.subjects.map(s=>`<option>${s}</option>`).join("");

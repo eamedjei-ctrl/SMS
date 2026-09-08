@@ -1,4 +1,4 @@
-// Shared shell: sidebar nav, topbar, auth guard. Uses sessionStorage for the demo "session".
+// Shared shell: sidebar nav, topbar, auth guard.
 
 const NAV = {
   superadmin: [
@@ -54,6 +54,16 @@ const ROLE_LABELS = {
   student: "Student",
   parent: "Parent",
 };
+
+async function apiRequest(path, options = {}){
+  const response = await fetch(`${window.SMS_API_BASE || "http://127.0.0.1:5000/api"}${path}`, {
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error || "The API request failed.");
+  return body;
+}
 
 function getSession(){
   try { return JSON.parse(sessionStorage.getItem("sms_session")); } catch(e){ return null; }
@@ -115,4 +125,13 @@ function el(html){
   const t = document.createElement("template");
   t.innerHTML = html.trim();
   return t.content.firstChild;
+}
+
+async function loginWithApi(role, email, password){
+  const session = await apiRequest("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ role, email, password }),
+  });
+  sessionStorage.setItem("sms_session", JSON.stringify(session));
+  return session;
 }

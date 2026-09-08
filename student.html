@@ -42,6 +42,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"student", active:"student.html", title:"My Overview", sub:"Welcome back!" });
 
   const me = DB.students[0];
@@ -78,6 +79,7 @@
   document.getElementById("reports-hint").textContent = myReports.length ? `${myReports.length} report${myReports.length===1?"":"s"} available` : "No reports yet";
   const myOrders = ordersForStudent(me.name);
   document.getElementById("orders-hint").textContent = myOrders.length ? `${myOrders.length} order${myOrders.length===1?"":"s"} placed` : "Order uniforms & supplies";
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

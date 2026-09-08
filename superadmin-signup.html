@@ -48,8 +48,9 @@
   </div>
 </div>
 
+<script src="app.js"></script>
 <script>
-  document.getElementById("signup-form").addEventListener("submit", (e) => {
+  document.getElementById("signup-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -61,8 +62,11 @@
       errorMsg.style.display = "block";
       return;
     }
-    sessionStorage.setItem("sms_session", JSON.stringify({ role: "superadmin", name, email }));
-    window.location.href = "superadmin.html";
+    try {
+      const session = await apiRequest("/auth/signup", { method: "POST", body: JSON.stringify({ name, email, password }) });
+      sessionStorage.setItem("sms_session", JSON.stringify(session));
+      window.location.href = "superadmin.html";
+    } catch (error) { errorMsg.textContent = error.message; errorMsg.style.display = "block"; }
   });
 </script>
 </body>

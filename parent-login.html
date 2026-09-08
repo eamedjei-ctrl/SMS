@@ -36,15 +36,15 @@
 
 <script src="app.js"></script>
 <script>
-  document.getElementById("login-form").addEventListener("submit", (e) => {
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("email").value.trim();
     if (!email) {
       document.getElementById("error-msg").style.display = "block";
       return;
     }
-    sessionStorage.setItem("sms_session", JSON.stringify({ role: "parent", name: "Yaw Mensah", email }));
-    window.location.href = "parent.html";
+    try { await loginWithApi("parent", email, document.getElementById("password").value); window.location.href = "parent.html"; }
+    catch (error) { document.getElementById("error-msg").textContent = error.message; document.getElementById("error-msg").style.display = "block"; }
   });
 </script>
 </body>

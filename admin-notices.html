@@ -37,6 +37,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin-notices.html", title:"Notices", sub:"Publish and manage school-wide notices" });
 
   function renderNotices(){
@@ -47,17 +48,19 @@
         <div class="meta">${n.date}</div>
       </div>`).join("");
   }
-  function publishNotice(){
+  async function publishNotice(){
     const title = document.getElementById("n-title").value.trim();
     const body = document.getElementById("n-body").value.trim();
     const role = document.getElementById("n-role").value;
     if (!title) return;
-    DB.notices.push({ title, body, role, date: new Date().toISOString().slice(0,10) });
+    await addNotice({ title, body, role, date: new Date().toISOString().slice(0,10) });
     document.getElementById("n-title").value = "";
     document.getElementById("n-body").value = "";
     renderNotices();
   }
+  window.publishNotice = publishNotice;
   renderNotices();
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

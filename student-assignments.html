@@ -25,6 +25,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"student", active:"student-assignments.html", title:"Assignments", sub:"Track your assignment status and due dates" });
 
   document.getElementById("list").innerHTML = DB.assignments.map(a=>`
@@ -33,6 +34,7 @@
       <div class="meta">${a.subject}</div>
       <div class="meta">Due ${a.due}</div>
     </div>`).join("");
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

@@ -28,6 +28,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const ward = DB.students[0];
   renderShell({ role:"parent", active:"parent-timetable.html", title:"Ward Timetable", sub:`${ward.name} · ${ward.class}` });
 
@@ -40,6 +41,7 @@
       <td>${t.thu}</td>
       <td>${t.fri}</td>
     </tr>`).join("");
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

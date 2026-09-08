@@ -39,6 +39,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin-fees.html", title:"School Fees", sub:"Upload fee statements for parents to view and download" });
 
   const classOptions = DB.classes.map(c=>`<option>${c.name}</option>`).join("");
@@ -86,6 +87,7 @@
     };
     reader.readAsDataURL(file);
   });
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

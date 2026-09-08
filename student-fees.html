@@ -25,6 +25,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const me = DB.students[0];
   renderShell({ role:"student", active:"student-fees.html", title:"School Fees", sub:"Fee statements uploaded by the school" });
 
@@ -37,6 +38,7 @@
       </div>
       <a class="btn small" href="${f.fileData}" download="${f.fileName}">Download</a>
     </div>`).join("") : `<div class="empty">No fee statements have been uploaded yet</div>`;
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

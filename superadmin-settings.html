@@ -70,7 +70,9 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"superadmin", active:"superadmin-settings.html", title:"Settings & Backups", sub:"Platform configuration, backups and integrations" });
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

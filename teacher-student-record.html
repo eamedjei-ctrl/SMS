@@ -20,6 +20,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const session = renderShell({ role:"teacher", active:"teacher-students.html", title:"Student Record", sub:"" });
 
   const params = new URLSearchParams(window.location.search);
@@ -82,12 +83,9 @@
         </div>
       `;
       statuses.forEach(st => {
-        document.getElementById(`att-${st}`).addEventListener("click", () => {
-          const i = DB.attendanceToday.findIndex(a=>a.student===student.name);
-          if (i >= 0) DB.attendanceToday[i].status = st;
-          else DB.attendanceToday.push({ student: student.name, status: st });
-          persistRecords();
-          renderAttendance();
+        document.getElementById(`att-${st}`).addEventListener("click", async () => {
+          try { await saveAttendance([{ student: student.name, status: st }]); renderAttendance(); }
+          catch (error) { alert(error.message); }
         });
       });
     }
@@ -120,7 +118,7 @@
     }
     renderAssessments();
 
-    document.getElementById("add-score-btn").addEventListener("click", () => {
+    document.getElementById("add-score-btn").addEventListener("click", async () => {
       const subject = document.getElementById("subject-select").value;
       const type = document.getElementById("type-input").value.trim() || "Assessment";
       const term = document.getElementById("term-select").value;
@@ -129,13 +127,14 @@
         alert("Enter a valid score between 0 and 100.");
         return;
       }
-      DB.assessments.push({ student: student.name, subject, type, score, max: 100, term });
-      persistRecords();
+      try { await addAssessment({ student: student.name, subject, type, score, max: 100, term }); }
+      catch (error) { alert(error.message); return; }
       document.getElementById("type-input").value = "";
       document.getElementById("score-input").value = "";
       renderAssessments();
     });
   }
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

@@ -39,6 +39,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin-reports.html", title:"Student Reports", sub:"Upload report cards for parents to view and download" });
 
   document.getElementById("r-student").innerHTML = DB.students.map(s=>`<option>${s.name}</option>`).join("");
@@ -85,6 +86,7 @@
     };
     reader.readAsDataURL(file);
   });
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

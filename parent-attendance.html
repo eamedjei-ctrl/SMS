@@ -33,6 +33,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"parent", active:"parent-attendance.html", title:"Ward Attendance", sub:"Kojo Mensah · JHS 1A" });
 
   const ward = DB.students[0];
@@ -57,6 +58,7 @@
   });
   document.getElementById("history-body").innerHTML = rows.map(r=>`
     <tr><td>${r.date}</td><td><span class="badge ${badgeFor(r.status)}">${r.status}</span></td></tr>`).join("");
+  }).catch(error => alert(error.message));
 </script>
 </body>
 </html>

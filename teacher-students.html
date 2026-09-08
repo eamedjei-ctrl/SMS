@@ -44,6 +44,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   const session = renderShell({ role:"teacher", active:"teacher-students.html", title:"My Students", sub:"Students across your assigned classes" });
 
   const myClasses = classesForTeacher(session.name);

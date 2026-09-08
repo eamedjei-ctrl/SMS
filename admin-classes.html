@@ -37,7 +37,7 @@
         <div class="row-flex" id="subjects-list" style="flex-wrap:wrap;gap:8px;"></div>
         <div class="toolbar" style="margin-top:14px;">
           <input id="new-subject" placeholder="New subject name" style="flex:1;">
-          <button class="btn" onclick="addSubject()">+ Add Subject</button>
+          <button class="btn" onclick="addSubjectToCatalogue()">+ Add Subject</button>
         </div>
       </div>
     </div>
@@ -46,6 +46,7 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
+  API_READY.then(async () => {
   renderShell({ role:"admin", active:"admin-classes.html", title:"Classes & Subjects", sub:"Manage class groups and the subject catalogue" });
 
   document.getElementById("teacher-select").innerHTML = DB.teachers.map(t=>`<option>${t.name}</option>`).join("");
@@ -63,14 +64,15 @@
   }
   renderSubjects();
 
-  function addSubject(){
+  async function addSubjectToCatalogue(){
     const input = document.getElementById("new-subject");
     if (input.value.trim()){
-      DB.subjects.push(input.value.trim());
+      await addSubject(input.value.trim());
       input.value = "";
       renderSubjects();
     }
   }
+  window.addSubjectToCatalogue = addSubjectToCatalogue;
 </script>
 <style>#new-class-form.open-form{display:block !important;}</style>
 </body>
