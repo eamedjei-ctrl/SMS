@@ -1,0 +1,62 @@
+{
+  "template_id": "cambridge-lower-secondary-v1",
+  "name": "Cambridge Lower Secondary",
+  "curriculum": "cambridge",
+  "country": "GH",
+  "version": 1,
+  "_provenance": "PLACEHOLDER VALUES. Replace with the PM's curriculum research output (Appendix A). Note what differs from the GES template: term names, components, weights, grades, remarks, rounding and position scope -- and that not one line of application code differs.",
+  "academic_structure": {
+    "terms_per_year": 3,
+    "term_names": ["Michaelmas", "Lent", "Trinity"],
+    "year_name_format": "{start}/{end}"
+  },
+  "levels": [
+    { "name": "Year 7", "level": 7 },
+    { "name": "Year 8", "level": 8 },
+    { "name": "Year 9", "level": 9 }
+  ],
+  "subjects": [
+    { "name": "English", "code": "ENG", "is_core": true },
+    { "name": "Mathematics", "code": "MAT", "is_core": true },
+    { "name": "Science", "code": "SCI", "is_core": true },
+    { "name": "Global Perspectives", "code": "GLP", "is_core": false },
+    { "name": "Computing", "code": "ICT", "is_core": false }
+  ],
+  "assessment_components": [
+    { "name": "Coursework", "code": "CW", "weight": 40, "max_score": 100, "sequence": 1 },
+    { "name": "Examination", "code": "EX", "weight": 60, "max_score": 100, "sequence": 2 }
+  ],
+  "grade_scale": {
+    "name": "Cambridge Lower Secondary",
+    "bands": [
+      { "min": 90, "max": 100, "grade": "A*", "remark": "Outstanding" },
+      { "min": 80, "max": 89, "grade": "A", "remark": "Excellent" },
+      { "min": 70, "max": 79, "grade": "B", "remark": "Very Good" },
+      { "min": 60, "max": 69, "grade": "C", "remark": "Good" },
+      { "min": 50, "max": 59, "grade": "D", "remark": "Satisfactory" },
+      { "min": 0, "max": 49, "grade": "E", "remark": "Developing" }
+    ]
+  },
+  "computation_rules": {
+    "weight_interpretation": "percentage",
+    "rounding": { "mode": "half_up", "decimals": 1 },
+    "missing_score": "treat_as_zero",
+    "absent_handling": "treat_as_zero",
+    "position_basis": "total_score",
+    "position_scope": "year_group",
+    "tie_rule": "shared_position",
+    "aggregate_method": "mean_of_totals",
+    "pass_mark": 50
+  },
+  "report_card": {
+    "name": "Cambridge report card",
+    "template": "standard_cambridge",
+    "show_position": false,
+    "show_class_average": true,
+    "show_attendance": true,
+    "show_teacher_remark": true,
+    "show_head_remark": true,
+    "show_grade_key": true,
+    "signature_blocks": ["Form tutor", "Head of section"]
+  }
+}

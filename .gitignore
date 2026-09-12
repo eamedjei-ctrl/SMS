@@ -1,0 +1,25 @@
+# Secrets -- never committed (Appendix D)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases and generated files
+*.db
+*.sqlite3
+instance/
+backend/migrate-*.db
+backend/storage/
+
+# Editors / OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,67 @@
+{
+  "template_id": "ges-basic-v1",
+  "name": "GES Basic School",
+  "curriculum": "ges",
+  "country": "GH",
+  "version": 1,
+  "_provenance": "PLACEHOLDER VALUES. Replace with the PM's curriculum research output (Appendix A): every weight, band and remark must carry a source from a real school or an official GES document before a pilot school uses this.",
+  "academic_structure": {
+    "terms_per_year": 3,
+    "term_names": ["Term 1", "Term 2", "Term 3"],
+    "year_name_format": "{start}/{end}"
+  },
+  "levels": [
+    { "name": "Basic 1", "level": 1 },
+    { "name": "Basic 2", "level": 2 },
+    { "name": "Basic 3", "level": 3 },
+    { "name": "Basic 4", "level": 4 },
+    { "name": "Basic 5", "level": 5 },
+    { "name": "Basic 6", "level": 6 }
+  ],
+  "subjects": [
+    { "name": "English Language", "code": "ENG", "is_core": true },
+    { "name": "Mathematics", "code": "MAT", "is_core": true },
+    { "name": "Integrated Science", "code": "SCI", "is_core": true },
+    { "name": "Social Studies", "code": "SOC", "is_core": true },
+    { "name": "Computing", "code": "ICT", "is_core": false },
+    { "name": "Creative Arts", "code": "ART", "is_core": false },
+    { "name": "Ghanaian Language", "code": "GHL", "is_core": false }
+  ],
+  "assessment_components": [
+    { "name": "Class Score", "code": "CLS", "weight": 30, "max_score": 100, "sequence": 1 },
+    { "name": "Exam Score", "code": "EXM", "weight": 70, "max_score": 100, "sequence": 2 }
+  ],
+  "grade_scale": {
+    "name": "GES Basic",
+    "bands": [
+      { "min": 80, "max": 100, "grade": "1", "remark": "Excellent", "points": 1 },
+      { "min": 70, "max": 79, "grade": "2", "remark": "Very Good", "points": 2 },
+      { "min": 60, "max": 69, "grade": "3", "remark": "Good", "points": 3 },
+      { "min": 50, "max": 59, "grade": "4", "remark": "Credit", "points": 4 },
+      { "min": 40, "max": 49, "grade": "5", "remark": "Pass", "points": 5 },
+      { "min": 0, "max": 39, "grade": "6", "remark": "Fail", "points": 6 }
+    ]
+  },
+  "computation_rules": {
+    "weight_interpretation": "percentage",
+    "rounding": { "mode": "half_up", "decimals": 0 },
+    "missing_score": "treat_as_zero",
+    "absent_handling": "exclude_from_ranking",
+    "position_basis": "total_score",
+    "position_scope": "class",
+    "tie_rule": "shared_position",
+    "aggregate_method": "mean_of_totals",
+    "pass_mark": 40
+  },
+  "report_card": {
+    "name": "GES standard report card",
+    "template": "standard_ges",
+    "show_position": true,
+    "show_class_average": true,
+    "show_attendance": true,
+    "show_teacher_remark": true,
+    "show_head_remark": true,
+    "show_grade_key": true,
+    "signature_blocks": ["Class teacher", "Head teacher"]
+  }
+}

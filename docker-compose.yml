@@ -1,0 +1,74 @@
+# SchoolOS -- deployable as-is on Coolify (Docker Compose resource) or locally.
+#
+# On Coolify: set every ${VAR} below in the resource's Environment Variables tab.
+# Never commit real values; .env is git-ignored and .env.example lists the keys.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-schoolos}
+      POSTGRES_USER: ${POSTGRES_USER:-schoolos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      # Deterministic collation, so ORDER BY on names does not shift under a
+      # base-image upgrade and silently reorder a class position list.
+      POSTGRES_INITDB_ARGS: "--locale-provider=icu --icu-locale=en-GB --encoding=UTF8"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-schoolos} -d ${POSTGRES_DB:-schoolos}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Cache, sessions, queue and rate limits share one server via logical DBs.
+    # appendonly keeps the token blacklist across a restart.
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory ${REDIS_MAXMEMORY:-256mb}
+      --maxmemory-policy volatile-ttl
+      --requirepass ${REDIS_PASSWORD:?set REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      FLASK_ENV: ${FLASK_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY}
+      APP_BASE_DOMAIN: ${APP_BASE_DOMAIN:?set APP_BASE_DOMAIN}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-schoolos}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-schoolos}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      STORAGE_LOCAL_PATH: /var/lib/schoolos/storage
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    volumes:
+      - storage_data:/var/lib/schoolos/storage
+    ports:
+      - "${API_PORT:-8000}:8000"
+
+volumes:
+  db_data:
+  redis_data:
+  storage_data:
